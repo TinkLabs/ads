@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" width="device-width">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>AD expand-demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    .container a {
+      display: block;
+    }
+    .container #expandImg {
+      width: 100%;
+      display: block;
+    }
+    .container .close-btn {
+      position: fixed;
+      top: 0;
+      right: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="close-btn">
+      <a href="./index.html">返回</a>
+    </div>
+    <a href="https://www.google.com" target="_blank">
+      <img id="expandImg" src="./720*1040.png" alt="720*1040">
+    </a>
+  </div>
+  <script>
+    window.onload = () => {
+      const expandImg = document.querySelector('#expandImg')
+      const clientHeight = window.screen.height
+      expandImg.style.height = `${clientHeight}px`
+    }
+  </script>
+  </script>
+  
+</body>
+</html>
