@@ -1,1 +1,2 @@
-# ad-ui
+# ads
+frontend for advertisement system
