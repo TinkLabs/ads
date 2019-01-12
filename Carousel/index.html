@@ -39,11 +39,9 @@
       let pages = document.getElementsByClassName("page");
 
       iframe[0].onload = function () {
-        console.log("框架加载完毕.");
         // delete blank iframe
         let temp = 0
         iframe.forEach((e, i) => {
-          console.log(i, e.contentWindow.document.body.childNodes.length)
           if (!e.contentWindow.document.body.childNodes.length) {
             swiperContainer.removeChild(pages[i - temp])
             temp = temp + 1;

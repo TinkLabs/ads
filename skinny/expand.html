@@ -39,11 +39,18 @@
     const searchParam = window.location.search.substring(1)
 
     // change img src and target page url
-    const temp = searchParam.indexOf('&clickurl=')
+    let temp = ''
+    let targetHref = ''
+    if (searchParam.indexOf('&amp;') > -1) {
+      temp = searchParam.indexOf('&amp;clickurl=')
+      targetHref = searchParam.slice(temp + 14)
+    } else {
+      temp = searchParam.indexOf('&clickurl=')
+      targetHref = searchParam.slice(temp + 10)
+    }
 
     // imgsrc=xxx&clickurl=xxx 
     const imgSrc = searchParam.slice(7, temp)
-    const targetHref = searchParam.slice(temp + 10, -1)
 
     document.addEventListener("DOMContentLoaded", function (event) {
       if (imgSrc) {
