@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Carousel AD</title>
+  <link rel="stylesheet" href="./css/pureSwiper.min.css">
+  <link rel="stylesheet" href="./css/index.css">
+  <script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
+
+  <script>
+    var googletag = googletag || {};
+    googletag.cmd = googletag.cmd || [];
+  </script>
+
+  <script>
+    googletag.cmd.push(function () {
+      googletag.defineSlot('/21623654641/Test/Test-Carousel-01', [360, 210], 'div-gpt-ad-1547119989301-0').addService(
+        googletag.pubads());
+      googletag.defineSlot('/21623654641/Test/Test-Carousel-02', [360, 210], 'div-gpt-ad-1547119989301-1').addService(
+        googletag.pubads());
+      googletag.defineSlot('/21623654641/Test/Test-Carousel-03', [360, 210], 'div-gpt-ad-1547119989301-2').addService(
+        googletag.pubads());
+      googletag.defineSlot('/21623654641/Test/Test-Carousel-04', [360, 210], 'div-gpt-ad-1547119989301-3').addService(
+        googletag.pubads());
+      googletag.defineSlot('/21623654641/Test/Test-Carousel-05', [360, 210], 'div-gpt-ad-1547119989301-4').addService(
+        googletag.pubads());
+      googletag.pubads().enableSingleRequest();
+      googletag.enableServices();
+    });
+  </script>
+
+  <script>
+    window.onload = () => {
+      let iframe = Array.prototype.slice.call(document.getElementsByTagName("iframe"));
+      let swiperContainer = document.getElementById('swiperContainer');
+      let pages = document.getElementsByClassName("page");
+
+      iframe[0].onload = function () {
+        console.log("框架加载完毕.");
+        // delete blank iframe
+        let temp = 0
+        iframe.forEach((e, i) => {
+          console.log(i, e.contentWindow.document.body.childNodes.length)
+          if (!e.contentWindow.document.body.childNodes.length) {
+            swiperContainer.removeChild(pages[i - temp])
+            temp = temp + 1;
+          }
+        });
+
+        // if has page, init slides
+        if (document.getElementsByClassName("page").length) {
+          new PureSwiper({
+            delay: 5000
+          }).init();
+        } else {
+          document.querySelector('body').removeChild(document.querySelector('#pureSwiper'))
+        }
+      };
+    }
+  </script>
+</head>
+
+<body>
+  <div id="pureSwiper">
+    <div id="swiperContainer">
+      <div class="page">
+        <div id='div-gpt-ad-1547119989301-0' style='height:210px; width:360px;'>
+          <script>
+            googletag.cmd.push(function () {
+              googletag.display('div-gpt-ad-1547119989301-0');
+            });
+          </script>
+        </div>
+      </div>
+      <div class="page" style="position: relative">
+        <div id='div-gpt-ad-1547119989301-1' style='height:210px; width:360px;'>
+          <script>
+            googletag.cmd.push(function () {
+              googletag.display('div-gpt-ad-1547119989301-1');
+            });
+          </script>
+        </div>
+      </div>
+      <div class="page" style="position: relative">
+        <div id='div-gpt-ad-1547119989301-2' style='height:210px; width:360px;'>
+          <script>
+            googletag.cmd.push(function () {
+              googletag.display('div-gpt-ad-1547119989301-2');
+            });
+          </script>
+        </div>
+      </div>
+      <div class="page" style="position: relative">
+        <div id='div-gpt-ad-1547119989301-3' style='height:210px; width:360px;'>
+          <script>
+            googletag.cmd.push(function () {
+              googletag.display('div-gpt-ad-1547119989301-3');
+            });
+          </script>
+        </div>
+      </div>
+      <div class="page" style="position: relative">
+        <div id='div-gpt-ad-1547119989301-4' style='height:210px; width:360px;'>
+          <script>
+            googletag.cmd.push(function () {
+              googletag.display('div-gpt-ad-1547119989301-4');
+            });
+          </script>
+        </div>
+      </div>
+    </div>
+    <script src="./js/pureSwiper.min.js"></script>
+</body>
+
+</html>
