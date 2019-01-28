@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" width="device-width">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Hi AD</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .container a {
+      display: block;
+    }
+
+    .container #expandImg {
+      width: 100%;
+      display: block;
+    }
+
+    .container .close-btn {
+      position: fixed;
+      top: 0;
+      right: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <a href="https://www.hiinc.com/" target="_blank">
+      <img id="expandImg" src="https://www.hiinc.com/images/main/Homepage_Image_Mobile_Header_425.png" alt="fullScreen">
+    </a>
+  </div>
+  <script>
+    const searchParam = window.location.search.substring(1)
+
+    // change img src and target page url
+    const temp = searchParam.indexOf('&clickurl=')
+
+    // imgsrc=xxx&clickurl=xxx 
+    const imgSrc = searchParam.slice(7, temp)
+    const targetHref = searchParam.slice(temp + 10, -1)
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+      if (imgSrc) {
+        const expandImg = document.querySelector('#expandImg')
+        const link = document.querySelector('a')
+        expandImg.src = imgSrc
+        link.href = targetHref
+      }
+
+      const clientHeight = document.documentElement.clientHeight
+      expandImg.style.height = `${clientHeight}px`
+    });
+  </script>
+</body>
+
+</html>
