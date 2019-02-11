@@ -43,7 +43,7 @@
         iframe.forEach((e, i) => {
           if (!e.contentWindow.document.body.childNodes.length) {
             console.log(i)
-            swiperWrapper.removeChild(e.parentNode.parentNode.parentNode)
+            // swiperWrapper.removeChild(e.parentNode.parentNode.parentNode)
           } else {
             let img = e.contentWindow.document.querySelector('.i-amphtml-layout-fixed')
             if (!img) {
