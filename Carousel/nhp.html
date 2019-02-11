@@ -35,12 +35,14 @@
   <script>
     window.onload = () => {
       let iframe = Array.prototype.slice.call(document.getElementsByTagName("iframe")).splice(0, 5);
+      console.log(iframe)
       let swiperWrapper = document.querySelector('.swiper-wrapper');
       let swiperContainer = document.querySelector('.swiper-container');
 
       setTimeout(() => {
         iframe.forEach((e, i) => {
           if (!e.contentWindow.document.body.childNodes.length) {
+            console.log(i)
             swiperWrapper.removeChild(e.parentNode.parentNode.parentNode)
           } else {
             let img = e.contentWindow.document.querySelector('.i-amphtml-layout-fixed')
@@ -70,7 +72,7 @@
           swiperContainer.style.display = 'none'
         }
         // Initialize Swiper
-      }, 1000)
+      }, 2000)
     }
   </script>
 
@@ -99,7 +101,8 @@
     .swiper-container-horizontal>.swiper-pagination-bullets .swiper-pagination-bullet {
       width: 9px;
       height: 9px;
-      margin: 0 10px;
+      padding: 10px;
+      background-clip: content-box;
     }
     .swiper-slide {
       text-align: center;
@@ -120,15 +123,15 @@
       align-items: center;
     }
     .swiper-pagination-bullet-active {
-      background: #fff !important;
+      background-color: #fff !important;
       opacity: 0.75 !important;
+      background-clip: content-box;
     }
     .swiper-pagination-bullet {
       opacity: 0.25;
     }
     .swiper-container-horizontal>.swiper-pagination-bullets, .swiper-pagination-custom, .swiper-pagination-fraction {
       bottom: 0;
-      padding: 10px 0;
     }
   </style>
 </head>
