@@ -29,38 +29,61 @@
         googletag.pubads());
       googletag.pubads().enableSingleRequest();
       googletag.enableServices();
+      googletag.pubads().collapseEmptyDivs();
     });
   </script>
 
   <script>
     window.onload = () => {
       let iframe = Array.prototype.slice.call(document.getElementsByTagName("iframe")).splice(0, 5);
-      console.log(iframe)
+      // console.log(iframe)
       let swiperWrapper = document.querySelector('.swiper-wrapper');
       let swiperContainer = document.querySelector('.swiper-container');
+      // console.log(iframe.length, 23333)
+      let swiperSlideBefore = Array.prototype.slice.call(document.querySelectorAll('.swiper-slide'));
+
+      const allHasIframe = swiperSlideBefore.every(item => !!item.querySelector('iframe'))
 
       setTimeout(() => {
-        iframe.forEach((e, i) => {
-          if (!e.contentWindow.document.body.childNodes.length) {
-            console.log(i)
-            // swiperWrapper.removeChild(e.parentNode.parentNode.parentNode)
-          } else {
-            let img = e.contentWindow.document.querySelector('.i-amphtml-layout-fixed')
-            if (!img) {
-              img = e.contentWindow.document.querySelector('img')
+        // if ad is empty, there two condition: return iframe width empty body and no return iframe 
+        if (allHasIframe) {
+          iframe.forEach(item => {
+            if (!item.contentWindow.document.body.childNodes.length) {
+              swiperWrapper.removeChild(item.parentNode.parentNode.parentNode)
+            } else {
+              let img = item.contentWindow.document.querySelector('.i-amphtml-layout-fixed')
+              if (!img) {
+                img = item.contentWindow.document.querySelector('img')
+              }
+              // console.log(img)
+              img.style.width = '336px'
+              img.style.height = '196px'
             }
-            img.style.width = '336px'
-            img.style.height = '196px'
-          }
-        });
-        let swiperSlide = document.querySelector('.swiper-slide');
-        // console.log(swiperSlide, 1111)
-        if (swiperSlide) {
+          });
+        } else {
+          swiperSlideBefore.forEach(item => {
+            if (!item.querySelector('iframe')) {
+              swiperWrapper.removeChild(item)
+            } else {
+              let img = item.querySelector('iframe').contentWindow.document.querySelector('.i-amphtml-layout-fixed')
+              if (!img) {
+                img = item.querySelector('iframe').contentWindow.document.querySelector('img')
+              }
+              // console.log(img)
+              img.style.width = '336px'
+              img.style.height = '196px'
+            }
+          })
+        }
+
+        let swiperSlideAfter = document.querySelector('.swiper-slide');
+        // console.log(swiperSlideAfter, 1111)
+        if (swiperSlideAfter) {
           var swiper = new Swiper('.swiper-container', {
             spaceBetween: 30,
             centeredSlides: true,
             autoplay: {
-              delay: 50000,
+              delay: 5000,
               disableOnInteraction: false,
             },
             pagination: {
@@ -72,7 +95,7 @@
           swiperContainer.style.display = 'none'
         }
         // Initialize Swiper
-      }, 2000)
+      }, 100)
     }
   </script>
 
