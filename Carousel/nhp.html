@@ -39,6 +39,7 @@
       // console.log(iframe)
       let swiperWrapper = document.querySelector('.swiper-wrapper');
       let swiperContainer = document.querySelector('.swiper-container');
+      let loader = document.querySelector('.loader');
       // console.log(iframe.length, 23333)
       let swiperSlideBefore = Array.prototype.slice.call(document.querySelectorAll('.swiper-slide'));
 
@@ -91,11 +92,12 @@
               clickable: true,
             },
           });
+          loader.style.display = 'none'
         } else {
           swiperContainer.style.display = 'none'
         }
         // Initialize Swiper
-      }, 100)
+      }, 500)
     }
   </script>
 
@@ -118,6 +120,7 @@
       height: 196px;
     }
     .swiper-container {
+      position: relative;
       width: 336px;
       height: 196px;
     }
@@ -161,11 +164,68 @@
     .swiper-container-horizontal>.swiper-pagination-bullets .swiper-pagination-bullet {
       margin: 0;
     }
+    .loader {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding-top: 60px;
+      width: 336px;
+      height: 196px;
+      background-color: #f0f5f8;
+      z-index: 9999;
+    }
+    #loader-2 { 
+      text-align: center;
+    }
+    #loader-2 span{
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 100%;
+      margin: 36px 4px;
+    }
+
+    #loader-2 span:nth-child(1){
+      animation: bounce 1s ease-in-out infinite;
+      background-color: rgb(171, 197, 227);
+    }
+
+    #loader-2 span:nth-child(2){
+      animation: bounce 1s ease-in-out 0.33s infinite;
+      background-color: rgb(114, 153, 196);
+
+    }
+
+    #loader-2 span:nth-child(3){
+      animation: bounce 1s ease-in-out 0.66s infinite;
+      background-color: rgb(43, 91, 140);
+    }
+
+    @keyframes bounce{
+      0%, 75%, 100%{
+        -webkit-transform: translateY(0);
+        -ms-transform: translateY(0);
+        -o-transform: translateY(0);
+        transform: translateY(0);
+      }
+
+      25%{
+        -webkit-transform: translateY(-10px);
+        -ms-transform: translateY(-10px);
+        -o-transform: translateY(-10px);
+        transform: translateY(-10px);
+      }
+    }
   </style>
 </head>
 <body>
   <!-- Swiper -->
   <div class="swiper-container">
+    <div class="loader" id="loader-2">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
     <div class="swiper-wrapper">
       <div class="swiper-slide">
         <div id='div-gpt-ad-1547119989301-0'>
