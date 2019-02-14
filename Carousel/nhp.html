@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +17,44 @@
   </script>
 
   <script>
+    const getCookie = name => {
+      //获取name在Cookie中起止位置
+      let start = document.cookie.indexOf(name + "=")
+
+      if (start !== -1) {
+        start = start + name.length + 1
+        //获取value的终止位置
+        let end = document.cookie.indexOf(";", start)
+        if (end === -1)
+          end = document.cookie.length
+        //截获cookie的value值,并返回
+        return unescape(document.cookie.substring(start, end))
+      }
+      return ""
+    }
+
+    // get ad param from android
+    const isAndroid = typeof window.Android !== 'undefined'
+    let hotelId = ''
+    let campaignId = ''
+    let lang = getCookie('locale')
+
+    if (isAndroid) {
+      globalProperties = JSON.parse(window.Android.getGlobalProperties())
+      hotelId = globalProperties.hotel_id
+      if (window.Android.getCampaignId) {
+        console.log('========= getCampaignId:', window.Android.getCampaignId())
+        campaignId = window.Android.getCampaignId()
+      }
+
+      // get auth
+      const token = JSON.stringify({
+        "barcode": getCookie('barcode'),
+        "key": getCookie('key'),
+      })
+
+      auth = Base64.encode(token)
+    }
     googletag.cmd.push(function () {
       googletag.defineSlot('/21623654641/Test/NHP-C-01', [360, 210], 'div-gpt-ad-1547119989301-0').addService(
         googletag.pubads());
@@ -30,6 +69,7 @@
       googletag.pubads().enableSingleRequest();
       googletag.enableServices();
       googletag.pubads().collapseEmptyDivs();
+      googletag.pubads().setTargeting('hotel_id', [hotelId]).setTargeting('lang', [lang]).setTargeting('campaign_id', [campaignId]);
     });
   </script>
 
