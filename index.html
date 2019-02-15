@@ -42,11 +42,8 @@
     let campaignId = ''
     let lang = ''
 
-    console.log(23333333, isAndroid && window.Android.getAdKeyValue())
-
     if (isAndroid && window.Android.getAdKeyValue) {
       adKeyValue = JSON.parse(window.Android.getAdKeyValue())
-      console.log('========= adKeyValue', window.Android.getAdKeyValue())
       hotelId = adKeyValue.hotel_id
       zoneId = adKeyValue.zone_id
       star = adKeyValue.star
@@ -54,6 +51,8 @@
       campaignId = adKeyValue.campaign_id
       lang = adKeyValue.lang
     }
+
+    console.log('========= hotelId, campaignId, lang, star, country, zoneId', hotelId, campaignId, lang, star, country, zoneId)
 
     googletag.cmd.push(function () {
       googletag.defineSlot('/21623654641/Test/NHP-C-01', [360, 210], 'div-gpt-ad-1547119989301-0').addService(
@@ -93,28 +92,12 @@
           iframe.forEach(item => {
             if (!item.contentWindow.document.body.childNodes.length) {
               swiperWrapper.removeChild(item.parentNode.parentNode.parentNode)
-            } else {
-              let img = item.contentWindow.document.querySelector('.i-amphtml-layout-fixed')
-              if (!img) {
-                img = item.contentWindow.document.querySelector('img')
-              }
-              // console.log(img)
-              img.style.width = '336px'
-              img.style.height = '196px'
             }
           });
         } else {
           swiperSlideBefore.forEach(item => {
             if (!item.querySelector('iframe')) {
               swiperWrapper.removeChild(item)
-            } else {
-              let img = item.querySelector('iframe').contentWindow.document.querySelector('.i-amphtml-layout-fixed')
-              if (!img) {
-                img = item.querySelector('iframe').contentWindow.document.querySelector('img')
-              }
-              // console.log(img)
-              img.style.width = '336px'
-              img.style.height = '196px'
             }
           })
         }
@@ -158,13 +141,13 @@
       padding: 0;
     }
     iframe {
-      width: 336px;
-      height: 196px;
+      width: 360px;
+      height: 210px;
     }
     .swiper-container {
       position: relative;
-      width: 336px;
-      height: 196px;
+      width: 360px;
+      height: 210px;
     }
     .swiper-container-horizontal>.swiper-pagination-bullets .swiper-pagination-bullet {
       width: 9px;
@@ -211,8 +194,8 @@
       top: 0;
       left: 0;
       padding-top: 60px;
-      width: 336px;
-      height: 196px;
+      width: 360px;
+      height: 210px;
       background-color: #f0f5f8;
       z-index: 9999;
     }
@@ -234,7 +217,7 @@
 
     #loader-2 span:nth-child(2){
       animation: bounce 1s ease-in-out 0.33s infinite;
-      background-color: rgb(114, 153, 196);
+      background-color: rgb(114, 153, 210);
 
     }
 
