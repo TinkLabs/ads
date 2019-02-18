@@ -1,13 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Carousel AD</title>
-  <link rel="stylesheet" href="./css/pureSwiper.min.css">
-  <link rel="stylesheet" href="./css/index.css">
+  <meta charset="utf-8">
+  <title>Swiper demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.4.6/css/swiper.min.css">
+
   <script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
 
   <script>
@@ -16,56 +17,268 @@
   </script>
 
   <script>
+    const getCookie = name => {
+      //获取name在Cookie中起止位置
+      let start = document.cookie.indexOf(name + "=")
+
+      if (start !== -1) {
+        start = start + name.length + 1
+        //获取value的终止位置
+        let end = document.cookie.indexOf(";", start)
+        if (end === -1)
+          end = document.cookie.length
+        //截获cookie的value值,并返回
+        return unescape(document.cookie.substring(start, end))
+      }
+      return ""
+    }
+
+    // get ad param from android
+    const isAndroid = typeof window.Android !== 'undefined'
+    let hotelId = ''
+    let zoneId = ''
+    let star = ''
+    let country = ''
+    let campaignId = ''
+    let lang = ''
+
+    console.log(23333333, isAndroid && window.Android.getAdKeyValue())
+
+    if (isAndroid && window.Android.getAdKeyValue) {
+      adKeyValue = JSON.parse(window.Android.getAdKeyValue())
+      console.log('========= adKeyValue', window.Android.getAdKeyValue())
+      hotelId = adKeyValue.hotel_id
+      zoneId = adKeyValue.zone_id
+      star = adKeyValue.star
+      country = adKeyValue.country
+      campaignId = adKeyValue.campaign_id
+      lang = adKeyValue.lang
+    }
+
+    const AD_HOST = window.location.host
+    let ad_path
+    if (AD_HOST === 'ads.hi.com') {
+      ad_path = 'Tinklabs'
+    } else {
+      ad_path = 'Test'
+    }
+
     googletag.cmd.push(function () {
-      googletag.defineSlot('/21623654641/Test/Test-Carousel-01', [360, 210], 'div-gpt-ad-1547119989301-0').addService(
+      googletag.defineSlot(`/21623654641/${ad_path}/NHP-C-01`, [360, 210], 'div-gpt-ad-1547119989301-0').addService(
         googletag.pubads());
-      googletag.defineSlot('/21623654641/Test/Test-Carousel-02', [360, 210], 'div-gpt-ad-1547119989301-1').addService(
+      googletag.defineSlot(`/21623654641/${ad_path}/NHP-C-02`, [360, 210], 'div-gpt-ad-1547119989301-1').addService(
         googletag.pubads());
-      googletag.defineSlot('/21623654641/Test/Test-Carousel-03', [360, 210], 'div-gpt-ad-1547119989301-2').addService(
+      googletag.defineSlot(`/21623654641/${ad_path}/NHP-C-03`, [360, 210], 'div-gpt-ad-1547119989301-2').addService(
         googletag.pubads());
-      googletag.defineSlot('/21623654641/Test/Test-Carousel-04', [360, 210], 'div-gpt-ad-1547119989301-3').addService(
+      googletag.defineSlot(`/21623654641/${ad_path}/NHP-C-04`, [360, 210], 'div-gpt-ad-1547119989301-3').addService(
         googletag.pubads());
-      googletag.defineSlot('/21623654641/Test/Test-Carousel-05', [360, 210], 'div-gpt-ad-1547119989301-4').addService(
+      googletag.defineSlot(`/21623654641/${ad_path}/NHP-C-05`, [360, 210], 'div-gpt-ad-1547119989301-4').addService(
         googletag.pubads());
       googletag.pubads().enableSingleRequest();
       googletag.enableServices();
+      googletag.pubads().collapseEmptyDivs();
+      if (hotelId) {
+        googletag.pubads().setTargeting('country', [country]).setTargeting('zone_id', [zoneId]).setTargeting('star', [star]).setTargeting('hotel_id', [hotelId]).setTargeting('lang', [lang]).setTargeting('campaign_id', [campaignId]);
+      }
     });
   </script>
 
   <script>
     window.onload = () => {
-      let iframe = Array.prototype.slice.call(document.getElementsByTagName("iframe"));
-      let swiperContainer = document.getElementById('swiperContainer');
-      let pages = document.getElementsByClassName("page");
+      let iframe = Array.prototype.slice.call(document.getElementsByTagName("iframe")).splice(0, 5);
+      // console.log(iframe)
+      let swiperWrapper = document.querySelector('.swiper-wrapper');
+      let swiperContainer = document.querySelector('.swiper-container');
+      let loader = document.querySelector('.loader');
+      // console.log(iframe.length, 23333)
+      let swiperSlideBefore = Array.prototype.slice.call(document.querySelectorAll('.swiper-slide'));
 
-      iframe[0].onload = function () {
-        // delete blank iframe
-        let temp = 0
-        iframe.forEach((e, i) => {
-          if (!e.contentWindow.document.body.childNodes.length) {
-            swiperContainer.removeChild(pages[i - temp])
-            temp = temp + 1;
-          }
-        });
+      const allHasIframe = swiperSlideBefore.every(item => !!item.querySelector('iframe'))
 
-        // if has page, init slides
-        if (document.getElementsByClassName("page").length) {
-          new PureSwiper({
-            delay: 5000
-          }).init();
+      setTimeout(() => {
+        // if ad is empty, there two condition: return iframe width empty body and no return iframe 
+        if (allHasIframe) {
+          iframe.forEach(item => {
+            if (!item.contentWindow.document.body.childNodes.length) {
+              swiperWrapper.removeChild(item.parentNode.parentNode.parentNode)
+            } else {
+              let img = item.contentWindow.document.querySelector('.i-amphtml-layout-fixed')
+              if (!img) {
+                img = item.contentWindow.document.querySelector('img')
+              }
+              // console.log(img)
+              img.style.width = '336px'
+              img.style.height = '196px'
+            }
+          });
         } else {
-          document.querySelector('body').removeChild(document.querySelector('#pureSwiper'))
+          swiperSlideBefore.forEach(item => {
+            if (!item.querySelector('iframe')) {
+              // swiperWrapper.removeChild(item)
+            } else {
+              let img = item.querySelector('iframe').contentWindow.document.querySelector('.i-amphtml-layout-fixed')
+              if (!img) {
+                img = item.querySelector('iframe').contentWindow.document.querySelector('img')
+              }
+              // console.log(img)
+              img.style.width = '336px'
+              img.style.height = '196px'
+            }
+          })
         }
-      };
+
+        let swiperSlideAfter = document.querySelector('.swiper-slide');
+        // console.log(swiperSlideAfter, 1111)
+        if (swiperSlideAfter) {
+          var swiper = new Swiper('.swiper-container', {
+            spaceBetween: 30,
+            centeredSlides: true,
+            autoplay: {
+              delay: 3000,
+              disableOnInteraction: false,
+            },
+            pagination: {
+              el: '.swiper-pagination',
+              clickable: true,
+            },
+          });
+          loader.style.display = 'none'
+        } else {
+          swiperContainer.style.display = 'none'
+        }
+        // Initialize Swiper
+      }, 500)
     }
   </script>
-</head>
 
+  <!-- Demo styles -->
+  <style>
+    html, body {
+      position: relative;
+      height: 100%;
+    }
+    body {
+      background: #eee;
+      font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      color:#000;
+      margin: 0;
+      padding: 0;
+    }
+    iframe {
+      width: 336px;
+      height: 196px;
+    }
+    .swiper-container {
+      position: relative;
+      width: 336px;
+      height: 196px;
+    }
+    .swiper-container-horizontal>.swiper-pagination-bullets .swiper-pagination-bullet {
+      width: 9px;
+      height: 9px;
+      padding: 20px 12px;
+      background-clip: content-box;
+      outline: none;
+      -webkit-tap-highlight-color: rgba(255,255,255,0);
+    }
+    .swiper-slide {
+      text-align: center;
+      font-size: 18px;
+      background: #fff;
+      /* Center slide text vertically */
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+    }
+    .swiper-pagination-bullet-active {
+      background-color: #fff !important;
+      opacity: 0.75 !important;
+      background-clip: content-box;
+    }
+    .swiper-pagination-bullet {
+      opacity: 0.25;
+    }
+    .swiper-container-horizontal>.swiper-pagination-bullets, .swiper-pagination-custom, .swiper-pagination-fraction {
+      bottom: -10px;
+    }
+    .swiper-container-horizontal>.swiper-pagination-bullets .swiper-pagination-bullet {
+      margin: 0;
+    }
+    .loader {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding-top: 60px;
+      width: 336px;
+      height: 196px;
+      background-color: #f0f5f8;
+      z-index: 9999;
+    }
+    #loader-2 { 
+      text-align: center;
+    }
+    #loader-2 span{
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 100%;
+      margin: 36px 4px;
+    }
+
+    #loader-2 span:nth-child(1){
+      animation: bounce 1s ease-in-out infinite;
+      background-color: rgb(171, 197, 227);
+    }
+
+    #loader-2 span:nth-child(2){
+      animation: bounce 1s ease-in-out 0.33s infinite;
+      background-color: rgb(114, 153, 196);
+
+    }
+
+    #loader-2 span:nth-child(3){
+      animation: bounce 1s ease-in-out 0.66s infinite;
+      background-color: rgb(43, 91, 140);
+    }
+
+    @keyframes bounce{
+      0%, 75%, 100%{
+        -webkit-transform: translateY(0);
+        -ms-transform: translateY(0);
+        -o-transform: translateY(0);
+        transform: translateY(0);
+      }
+
+      25%{
+        -webkit-transform: translateY(-10px);
+        -ms-transform: translateY(-10px);
+        -o-transform: translateY(-10px);
+        transform: translateY(-10px);
+      }
+    }
+  </style>
+</head>
 <body>
-  <div id="pureSwiper">
-    <div id="swiperContainer">
-      <div class="page">
-        <div id='div-gpt-ad-1547119989301-0' style='height:210px; width:360px;'>
+  <!-- Swiper -->
+  <div class="swiper-container">
+    <div class="loader" id="loader-2">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <div class="swiper-wrapper">
+      <div class="swiper-slide">
+        <div id='div-gpt-ad-1547119989301-0'>
           <script>
             googletag.cmd.push(function () {
               googletag.display('div-gpt-ad-1547119989301-0');
@@ -73,8 +286,8 @@
           </script>
         </div>
       </div>
-      <div class="page" style="position: relative">
-        <div id='div-gpt-ad-1547119989301-1' style='height:210px; width:360px;'>
+      <div class="swiper-slide">
+        <div id='div-gpt-ad-1547119989301-1'>
           <script>
             googletag.cmd.push(function () {
               googletag.display('div-gpt-ad-1547119989301-1');
@@ -82,8 +295,8 @@
           </script>
         </div>
       </div>
-      <div class="page" style="position: relative">
-        <div id='div-gpt-ad-1547119989301-2' style='height:210px; width:360px;'>
+      <div class="swiper-slide">
+        <div id='div-gpt-ad-1547119989301-2'>
           <script>
             googletag.cmd.push(function () {
               googletag.display('div-gpt-ad-1547119989301-2');
@@ -91,8 +304,8 @@
           </script>
         </div>
       </div>
-      <div class="page" style="position: relative">
-        <div id='div-gpt-ad-1547119989301-3' style='height:210px; width:360px;'>
+      <div class="swiper-slide">
+        <div id='div-gpt-ad-1547119989301-3'>
           <script>
             googletag.cmd.push(function () {
               googletag.display('div-gpt-ad-1547119989301-3');
@@ -100,8 +313,8 @@
           </script>
         </div>
       </div>
-      <div class="page" style="position: relative">
-        <div id='div-gpt-ad-1547119989301-4' style='height:210px; width:360px;'>
+      <div class="swiper-slide">
+        <div id='div-gpt-ad-1547119989301-4'>
           <script>
             googletag.cmd.push(function () {
               googletag.display('div-gpt-ad-1547119989301-4');
@@ -110,7 +323,30 @@
         </div>
       </div>
     </div>
-    <script src="./js/pureSwiper.min.js"></script>
-</body>
+    <!-- Add Pagination -->
+    <div class="swiper-pagination"></div>
+    <!-- Add Arrows -->
+    <!-- <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div> -->
+  </div>
 
+  <!-- Swiper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.4.6/js/swiper.min.js"></script>
+
+  <!-- Initialize Swiper -->
+  <script>
+    // var swiper = new Swiper('.swiper-container', {
+    //   spaceBetween: 30,
+    //   centeredSlides: true,
+    //   autoplay: {
+    //     delay: 2500,
+    //     disableOnInteraction: false,
+    //   },
+    //   pagination: {
+    //     el: '.swiper-pagination',
+    //     clickable: true,
+    //   },
+    // });
+  </script>
+</body>
 </html>

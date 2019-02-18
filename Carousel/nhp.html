@@ -55,16 +55,24 @@
       lang = adKeyValue.lang
     }
 
+    const AD_PATH = window.location.host
+    let ad_path
+    if (AD_PATH === 'ads.hi.com') {
+      ad_path = 'Tinklabs'
+    } else {
+      ad_path = 'Test'
+    }
+
     googletag.cmd.push(function () {
-      googletag.defineSlot('/21623654641/Test/NHP-C-01', [360, 210], 'div-gpt-ad-1547119989301-0').addService(
+      googletag.defineSlot(`/21623654641/${ad_path}/NHP-C-01`, [360, 210], 'div-gpt-ad-1547119989301-0').addService(
         googletag.pubads());
-      googletag.defineSlot('/21623654641/Test/NHP-C-02', [360, 210], 'div-gpt-ad-1547119989301-1').addService(
+      googletag.defineSlot(`/21623654641/${ad_path}/NHP-C-02`, [360, 210], 'div-gpt-ad-1547119989301-1').addService(
         googletag.pubads());
-      googletag.defineSlot('/21623654641/Test/NHP-C-03', [360, 210], 'div-gpt-ad-1547119989301-2').addService(
+      googletag.defineSlot(`/21623654641/${ad_path}/NHP-C-03`, [360, 210], 'div-gpt-ad-1547119989301-2').addService(
         googletag.pubads());
-      googletag.defineSlot('/21623654641/Test/NHP-C-04', [360, 210], 'div-gpt-ad-1547119989301-3').addService(
+      googletag.defineSlot(`/21623654641/${ad_path}/NHP-C-04`, [360, 210], 'div-gpt-ad-1547119989301-3').addService(
         googletag.pubads());
-      googletag.defineSlot('/21623654641/Test/NHP-C-05', [360, 210], 'div-gpt-ad-1547119989301-4').addService(
+      googletag.defineSlot(`/21623654641/${ad_path}/NHP-C-05`, [360, 210], 'div-gpt-ad-1547119989301-4').addService(
         googletag.pubads());
       googletag.pubads().enableSingleRequest();
       googletag.enableServices();
@@ -106,7 +114,7 @@
         } else {
           swiperSlideBefore.forEach(item => {
             if (!item.querySelector('iframe')) {
-              swiperWrapper.removeChild(item)
+              // swiperWrapper.removeChild(item)
             } else {
               let img = item.querySelector('iframe').contentWindow.document.querySelector('.i-amphtml-layout-fixed')
               if (!img) {
