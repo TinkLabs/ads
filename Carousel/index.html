@@ -98,8 +98,11 @@
         // if ad is empty, there two condition: return iframe width empty body and no return iframe 
         if (allHasIframe) {
           iframe.forEach(item => {
-            if (!item.contentWindow.document.body.childNodes.length) {
-              swiperWrapper.removeChild(item.parentNode.parentNode.parentNode)
+            // google ad exchange embed iframe with crossdomain src
+            if (!item.src) {
+              if (!item.contentWindow.document.body.childNodes.length) {
+                swiperWrapper.removeChild(item.parentNode.parentNode.parentNode)
+              }
             }
           });
         } else {
