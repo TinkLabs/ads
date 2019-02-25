@@ -129,6 +129,9 @@
             },
           });
           loader.style.display = 'none'
+          if (document.querySelectorAll('.swiper-slide').length === 1) {
+            document.querySelector('.swiper-pagination').style.display = 'none'
+          }
         } else {
           swiperContainer.style.display = 'none'
         }
