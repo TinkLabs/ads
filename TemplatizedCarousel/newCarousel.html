@@ -68,8 +68,8 @@
       .header-content{
         position: relative;
       }
-      .bottom-module,.hear-box{
-        padding:16px;
+      .bottom-module,.head-box{
+        padding: 3px 16px;
       }
       .title-text{
         position: absolute;
@@ -105,7 +105,7 @@
       }
     
       .carousel-box p{
-        margin-top:8px;
+        /* margin-top:8px; */
         font-size: 14px;
         display: -webkit-box;
         font-family: Roboto;
@@ -174,28 +174,28 @@
   <!-- css end -->
   <div class="carousel-box">
     <div class="carousel-content">
-      <div class="hear-box">
+      <div class="head-box">
         <a href="https://www.taobao.com/" >
           <div class="header-content">
-            <img class="header-logo" src="/img/Group 4.png" />
+            <img class="header-logo" src="img/Group 4.png" />
             <span class="title-text">Sept.infoSept.infoSept.infoSept.infoSept.infoSept.infoSept.infoSept.info</span>
           </div>
           <p>Real journalism takes more time.Support your slow journalism magazine.</p>
         </a>
       </div>
-      <img style="width:1px;height:1px;position:absolute;left: -192rem;" src="./img/Group 4.png" />
+      <img style="width:1px;height:1px;position:absolute;left: -192rem;" src="img/Group 4.png" />
       <div class="carousel-module">
           <a href="https://github.com/">
             <div class="pic">
-                <img src="../img/Carousel.png" alt="" onerror="imgFilter(event)">
+                <img src="img/Carousel.png" alt="" onerror="imgFilter(event)">
                 <img src="img/热特2.jpg" alt="" onerror="imgFilter(event)" >
                 <img src="" alt="" onerror="imgFilter(event)">
                 <img src=  alt="" onerror="imgFilter(event)">
                 <img src="undefined" alt="" onerror="imgFilter(event)">
                 <img src="" onerror="imgFilter(event)">
-                <img src="../img/Carousel.jpg" alt="" onerror="imgFilter(event)">
-                <img src="../img/Carousel2.jpg" alt="" onerror="imgFilter(event)">
-                <img src="../img/qwe9.jpg" alt="" onerror="imgFilter(event)">
+                <img src="img/Carousel.jpg" alt="" onerror="imgFilter(event)">
+                <img src="img/Carousel2.jpg" alt="" onerror="imgFilter(event)">
+                <img src="img/qwe9.jpg" alt="" onerror="imgFilter(event)">
             </div>
           </a>
         <div class="trig"></div>
@@ -230,7 +230,7 @@
         var timer = setInterval(handleMove, 3000);
         var showIndex = 0;
         var averWidth = carousel_module.clientWidth;
-
+  
         //initial width of some elements in accordance with the width of device
         pic.style.left = 0 + 'px';
         pic.style.height = averWidth/1.714286 + 'px';
@@ -254,19 +254,14 @@
                 
                 let trigHtml = '';
                 let showImgLength =0;
-                if(showIndex>0){
-                    for(var i = 0;i<showIndex;i++){
-                    
-                        trigHtml += '<span></span>';
-                    }
-                }else{
-                    return false;
-                }
                 
+                for(var i = 0;i<showIndex;i++){
+                
+                  trigHtml += '<span></span>';
+                }
 
                 trig.innerHTML=trigHtml;
                 buttons = trig.getElementsByTagName('span');
-                
                 buttons[0].className = "on";
                 
             }
@@ -284,17 +279,16 @@
         // }
 
         function buttonsShow() {
-            //将之前的小圆点的样式清除
-            if(showIndex>0){
-                        for (var i = 0; i < buttons.length; i++) {
+                    //将之前的小圆点的样式清除
+                    for (var i = 0; i < buttons.length; i++) {
                         if (buttons[i].className == "on") {
-                        buttons[i].className = "";
+                          buttons[i].className = "";
                         }
                     }
+                    console.log(index);
                     //数组从0开始，故index需要-1
-                
-                    buttons[index].className = "on";
-            }
+                    buttons[index].className = "on"
+                    
         }
               
         
