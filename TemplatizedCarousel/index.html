@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Carousel AD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+
+  <script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
+
+  <script>
+    var googletag = googletag || {};
+    googletag.cmd = googletag.cmd || [];
+  </script>
+
+  <script>
+    const getCookie = name => {
+      //获取name在Cookie中起止位置
+      let start = document.cookie.indexOf(name + "=")
+
+      if (start !== -1) {
+        start = start + name.length + 1
+        //获取value的终止位置
+        let end = document.cookie.indexOf(";", start)
+        if (end === -1)
+          end = document.cookie.length
+        //截获cookie的value值,并返回
+        return unescape(document.cookie.substring(start, end))
+      }
+      return ""
+    }
+
+    // get ad param from android
+    const isAndroid = typeof window.Android !== 'undefined'
+    let hotelId = ''
+    let zoneId = ''
+    let star = ''
+    let country = ''
+    let campaignId = ''
+    let lang = ''
+
+    if (isAndroid && window.Android.getAdKeyValue) {
+      adKeyValue = JSON.parse(window.Android.getAdKeyValue())
+      hotelId = adKeyValue.hotel_id
+      zoneId = adKeyValue.zone_id
+      star = adKeyValue.star
+      country = adKeyValue.country
+      campaignId = adKeyValue.campaign_id
+      lang = adKeyValue.lang
+    }
+
+    console.log('========= hotelId, campaignId, lang, star, country, zoneId', hotelId, campaignId, lang, star, country, zoneId)
+    
+    const AD_HOST = window.location.host
+    let adPath
+    if (AD_HOST === 'ads.hi.com') {
+      adPath = 'Tinklabs'
+    } else {
+      adPath = 'Test'
+    }
+
+    googletag.cmd.push(function () {
+      googletag.defineSlot(`/21623654641/${adPath}/Temp-C`, [360, 363], 'div-gpt-ad-1547119989301-0').addService(
+        googletag.pubads());
+
+      googletag.pubads().enableSingleRequest();
+      googletag.enableServices();
+      googletag.pubads().collapseEmptyDivs();
+      if (hotelId) {
+        googletag.pubads().setTargeting('country', [country]).setTargeting('zone_id', [zoneId]).setTargeting('star', [star]).setTargeting('hotel_id', [hotelId]).setTargeting('lang', [lang]).setTargeting('campaign_id', [campaignId]);
+      }
+    });
+  </script>
+  <!-- Demo styles -->
+
+</head>
+<body>
+ 
+  
+    <div id='div-gpt-ad-1547119989301-0'>
+        <script>
+        googletag.cmd.push(function () {
+            googletag.display('div-gpt-ad-1547119989301-0');
+        });
+        </script>
+    </div>
+</body>
+</html>
