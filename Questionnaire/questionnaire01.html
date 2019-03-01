@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>React 实例</title>
+<script src="https://cdn.staticfile.org/react/16.4.0/umd/react.development.js"></script>
+<script src="https://cdn.staticfile.org/react-dom/16.4.0/umd/react-dom.development.js"></script>
+<script src="https://cdn.staticfile.org/babel-standalone/6.26.0/babel.min.js"></script>
+</head>
+<style>
+*{
+    margin:0;
+}
+ul {
+        list-style-type: none !important;
+        padding-left: 2em;
+        margin-bottom: 10px;
+    }
+li {
+        margin-left: 0;
+
+    }
+.question-option{
+    display:inline-block;
+    margin-left:10px;
+}
+.question-item{
+    padding: 10px;
+    display: none;
+}
+.question-item:nth-child(1){
+    display: block;
+}
+.question-title{
+    display:inline-block;
+    margin-right: 5px;
+}
+</style>
+<body>
+
+<div id="example"></div>
+
+<script type="text/babel">
+
+// window.addEventListener("beforeunload", function (e) {
+//     (e || window.event).returnValue = '确定离开此页吗？';
+//     //注意：这里return方法是不起作用的
+// });
+ window.onbeforeunload=function(){
+         return ("还没有完成,确认退出吗?");
+    }
+    class NumberList extends React.Component {
+
+        constructor(props) {
+            super(props);
+            this.state = {
+                questionData:props.questionData,
+                question: props.questionData[0],
+                answerData:[],
+                currIndex:0
+                };
+            // 这边绑定是必要的，这样 `this` 才能在回调函数中使用
+            this.handleClick = this.handleClick.bind(this);
+        }
+        componentDidMount() {
+            // alert(23234);
+            // if(confirm('cancel')){
+            //     console.log('haha');
+            // }
+        }
+        componentWillMount () {
+            // 拦截判断是否离开当前页面
+            window.addEventListener('beforeunload', this.beforeunload);
+        }
+        componentWillUnmount () {
+            // 销毁拦截判断是否离开当前页面
+            // alert(235);
+            window.removeEventListener('beforeunload', this.beforeunload);
+        }
+        beforeunload (e) {
+            let confirmationMessage = '你确定离开此页面吗?';
+            (e || window.event).returnValue = confirmationMessage;
+            // alert(confirmationMessage);
+            return confirmationMessage;
+        }
+        getAnswerData(title,answer){
+            let answerDataObj = {};
+            answerDataObj.title = title;
+            answerDataObj.answer = answer;
+            this.state.answerData.push(answerDataObj);
+            console.log(this.state.answerData);
+        }
+        handleClick(obj,option) {
+            let currTimeout = setTimeout(() => {
+                    if(1){
+                       
+                        this.getAnswerData(this.state.question.title,obj);
+                        
+                            switch (this.state.currIndex) {
+                                case 0:
+                                    this.setState(prevState => ({
+                                        question:this.state.questionData[1],
+                                        currIndex:1
+                                    }));
+                                    break;
+
+                                case 1:
+                                    this.setState(prevState => ({
+                                            question:this.state.questionData[2],
+                                            currIndex:2
+                                        }));
+                                    break;
+                                case 2:
+                                    this.setState(prevState => ({
+                                            question:this.state.questionData[0],
+                                            currIndex:0,
+                                            answerData:[]
+                                        }));
+                                    break;
+                                default:
+                                    break;
+                            }
+                } 
+            }, 1000);
+        }
+
+        render() {
+            return (
+                <div>
+                    <div class="question-item">
+                        <span class="question-title" key={this.state.question.title}>{this.state.question.title},</span>
+                        <span key={this.state.question.description.toString()}>
+                            {this.state.question.description}
+                        </span>
+                        <ul>
+                            {
+                                this.state.question.options.map((option,index) =>
+                                            <li key={option.toString()}>
+                                                <input type="radio" onChange={this.handleClick.bind(this,option.toString())} data-value={option.toString()}/>
+                                                <span class="question-option" key={option.toString()}>
+                                                    {option}
+                                                </span>
+                                            </li>
+                                        )
+                            }
+                        </ul>
+                    </div>
+            </div>
+            );
+        }
+
+ }
+const questionData =[
+    
+    {
+        'title':'Q2',
+        "description":"Have you used or do you intend to use a Visa credit/debit/prepaid card during your trip in Japan?",
+        "options":["Yes","No","I do not own / did not bring a Visa"]
+    },
+    {
+        'title':'Q1',
+        "description":"Which of the following countries/regions are you travelling from? ",
+        "options":["Mainland","China","Hong Kong","Taiwan","Korea","Singapore","Malaysia",
+                "Thailand","Indonesia","Philippines","Vietnam","India",
+                "Australia","North America (USA, Canada)","Europe","Others"]
+    },
+    {
+        'title':'Q3',
+        "description":"Are you traveling for business or leisure?",
+        "options":["Business","Leisure"]
+    }
+];
+
+ReactDOM.render(
+    <NumberList questionData={questionData}/>,
+    document.getElementById('example')
+);
+</script>
+</body>
+</html>
