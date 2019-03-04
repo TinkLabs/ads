@@ -16,7 +16,7 @@
     googletag.cmd = googletag.cmd || [];
   </script>
 
-  <script>
+<script>
     const getCookie = name => {
       //获取name在Cookie中起止位置
       let start = document.cookie.indexOf(name + "=")
@@ -35,25 +35,19 @@
 
     // get ad param from android
     const isAndroid = typeof window.Android !== 'undefined'
-    let hotelId = ''
-    let zoneId = ''
-    let star = ''
-    let country = ''
-    let campaignId = ''
-    let lang = ''
+    let adParamsDict = []
 
     if (isAndroid && window.Android.getAdKeyValue) {
       adKeyValue = JSON.parse(window.Android.getAdKeyValue())
-      hotelId = adKeyValue.hotel_id
-      zoneId = adKeyValue.zone_id
-      star = adKeyValue.star
-      country = adKeyValue.country
-      campaignId = adKeyValue.campaign_id
-      lang = adKeyValue.lang
+
+      const adKeyArr = Object.keys(adKeyValue)
+      adKeyArr.forEach((key, index) => {
+        adParamsDict[index] = {}
+        adParamsDict[index].key = adKeyArr[index]
+        adParamsDict[index].value = adKeyValue[adKeyArr[index]]
+      })
     }
 
-    console.log('========= hotelId, campaignId, lang, star, country, zoneId', hotelId, campaignId, lang, star, country, zoneId)
-    
     const AD_HOST = window.location.host
     let adPath
     if (AD_HOST === 'ads.hi.com') {
@@ -76,9 +70,11 @@
       googletag.pubads().enableSingleRequest();
       googletag.enableServices();
       googletag.pubads().collapseEmptyDivs();
-      if (hotelId) {
-        googletag.pubads().setTargeting('country', [country]).setTargeting('zone_id', [zoneId]).setTargeting('star', [star]).setTargeting('hotel_id', [hotelId]).setTargeting('lang', [lang]).setTargeting('campaign_id', [campaignId]);
-      }
+
+      // dynamic set google ad params
+      adParamsDict.forEach(item => {
+        googletag.pubads().setTargeting(item.key, [item.value])
+      })
     });
   </script>
 
@@ -98,8 +94,11 @@
         // if ad is empty, there two condition: return iframe width empty body and no return iframe 
         if (allHasIframe) {
           iframe.forEach(item => {
-            if (!item.contentWindow.document.body.childNodes.length) {
-              swiperWrapper.removeChild(item.parentNode.parentNode.parentNode)
+            // google ad exchange embed iframe with crossdomain src
+            if (!item.src) {
+              if (!item.contentWindow.document.body.childNodes.length) {
+                swiperWrapper.removeChild(item.parentNode.parentNode.parentNode)
+              }
             }
           });
         } else {
@@ -126,6 +125,9 @@
             },
           });
           loader.style.display = 'none'
+          if (document.querySelectorAll('.swiper-slide').length === 1) {
+            document.querySelector('.swiper-pagination').style.display = 'none'
+          }
         } else {
           swiperContainer.style.display = 'none'
         }

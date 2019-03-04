@@ -35,24 +35,17 @@
 
     // get ad param from android
     const isAndroid = typeof window.Android !== 'undefined'
-    let hotelId = ''
-    let zoneId = ''
-    let star = ''
-    let country = ''
-    let campaignId = ''
-    let lang = ''
-
-    console.log(23333333, isAndroid && window.Android.getAdKeyValue())
+    let adParamsDict = []
 
     if (isAndroid && window.Android.getAdKeyValue) {
       adKeyValue = JSON.parse(window.Android.getAdKeyValue())
-      console.log('========= adKeyValue', window.Android.getAdKeyValue())
-      hotelId = adKeyValue.hotel_id
-      zoneId = adKeyValue.zone_id
-      star = adKeyValue.star
-      country = adKeyValue.country
-      campaignId = adKeyValue.campaign_id
-      lang = adKeyValue.lang
+
+      const adKeyArr = Object.keys(adKeyValue)
+      adKeyArr.forEach((key, index) => {
+        adParamsDict[index] = {}
+        adParamsDict[index].key = adKeyArr[index]
+        adParamsDict[index].value = adKeyValue[adKeyArr[index]]
+      })
     }
 
     const AD_HOST = window.location.host
@@ -77,9 +70,11 @@
       googletag.pubads().enableSingleRequest();
       googletag.enableServices();
       googletag.pubads().collapseEmptyDivs();
-      if (hotelId) {
-        googletag.pubads().setTargeting('country', [country]).setTargeting('zone_id', [zoneId]).setTargeting('star', [star]).setTargeting('hotel_id', [hotelId]).setTargeting('lang', [lang]).setTargeting('campaign_id', [campaignId]);
-      }
+
+      // dynamic set google ad params
+      adParamsDict.forEach(item => {
+        googletag.pubads().setTargeting(item.key, [item.value])
+      })
     });
   </script>
 
@@ -98,31 +93,40 @@
       setTimeout(() => {
         // if ad is empty, there two condition: return iframe width empty body and no return iframe 
         if (allHasIframe) {
-          iframe.forEach(item => {
-            if (!item.contentWindow.document.body.childNodes.length) {
-              swiperWrapper.removeChild(item.parentNode.parentNode.parentNode)
-            } else {
-              let img = item.contentWindow.document.querySelector('.i-amphtml-layout-fixed')
-              if (!img) {
-                img = item.contentWindow.document.querySelector('img')
+          iframe.forEach((item, index) => {
+            // google ad exchange embed iframe with cross domain src
+            if (!item.src) {
+              // judge own google ad empty
+              if (!item.contentWindow.document.body.childNodes.length) {
+                swiperWrapper.removeChild(item.parentNode.parentNode.parentNode)
+              } else {
+                let img = item.contentWindow.document.querySelector('.i-amphtml-layout-fixed')
+                if (!img) {
+                  img = item.contentWindow.document.querySelector('img')
+                }
+                // console.log(img)
+                img.style.width = '336px'
+                img.style.height = '196px'
               }
-              // console.log(img)
-              img.style.width = '336px'
-              img.style.height = '196px'
             }
           });
         } else {
           swiperSlideBefore.forEach(item => {
-            if (!item.querySelector('iframe')) {
+            const itemIframe = item.querySelector('iframe')
+            // judge own google ad empty
+            if (!itemIframe) {
               swiperWrapper.removeChild(item)
             } else {
-              let img = item.querySelector('iframe').contentWindow.document.querySelector('.i-amphtml-layout-fixed')
-              if (!img) {
-                img = item.querySelector('iframe').contentWindow.document.querySelector('img')
+              // google ad exchange embed iframe with cross domain src
+              if (!itemIframe.src) {
+                let img = item.querySelector('iframe').contentWindow.document.querySelector('.i-amphtml-layout-fixed')
+                if (!img) {
+                  img = item.querySelector('iframe').contentWindow.document.querySelector('img')
+                }
+                // console.log(img)
+                img.style.width = '336px'
+                img.style.height = '196px'
               }
-              // console.log(img)
-              img.style.width = '336px'
-              img.style.height = '196px'
             }
           })
         }
@@ -143,6 +147,9 @@
             },
           });
           loader.style.display = 'none'
+          if (document.querySelectorAll('.swiper-slide').length === 1) {
+            document.querySelector('.swiper-pagination').style.display = 'none'
+          }
         } else {
           swiperContainer.style.display = 'none'
         }
@@ -199,6 +206,10 @@
       -ms-flex-align: center;
       -webkit-align-items: center;
       align-items: center;
+    }
+    .swiper-slide div {
+      width: 336px !important;
+      height: 196px !important;
     }
     .swiper-pagination-bullet-active {
       background-color: #fff !important;
