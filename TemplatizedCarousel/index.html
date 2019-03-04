@@ -68,6 +68,8 @@
       googletag.pubads().collapseEmptyDivs();
       if (hotelId) {
         googletag.pubads().setTargeting('country', [country]).setTargeting('zone_id', [zoneId]).setTargeting('star', [star]).setTargeting('hotel_id', [hotelId]).setTargeting('lang', [lang]).setTargeting('campaign_id', [campaignId]);
+      }else{
+        googletag.pubads().setTargeting('country', ['46']).setTargeting('zone_id', ['395']).setTargeting('star', ['1']).setTargeting('hotel_id', ['5700']).setTargeting('lang', ['en_GB']).setTargeting('campaign_id', ['0']);
       }
     });
   </script>
