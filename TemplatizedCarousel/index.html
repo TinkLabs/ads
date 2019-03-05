@@ -76,11 +76,13 @@
     });
 
      window.onload = function() {
-        if(e.data.wl){
+        
           window.addEventListener('message',function(e){
+            if(e.data.wl){
           console.log(e.data.wl);
-        });
         }
+        });
+       
        
         // call parent
         // parent.postMessage("GetWhiteLabel","*");
