@@ -18,30 +18,14 @@
   </script>
 
 <script>
-    const getCookie = name => {
-      //获取name在Cookie中起止位置
-      let start = document.cookie.indexOf(name + "=")
-
-      if (start !== -1) {
-        start = start + name.length + 1
-        //获取value的终止位置
-        let end = document.cookie.indexOf(";", start)
-        if (end === -1)
-          end = document.cookie.length
-        //截获cookie的value值,并返回
-        return unescape(document.cookie.substring(start, end))
-      }
-      return ""
-    }
-
     // get ad param from android
-    const isAndroid = typeof window.Android !== 'undefined'
-    let adParamsDict = []
+    var isAndroid = typeof window.Android !== 'undefined'
+    var adParamsDict = []
 
     if (isAndroid && window.Android.getAdKeyValue) {
       adKeyValue = JSON.parse(window.Android.getAdKeyValue())
 
-      const adKeyArr = Object.keys(adKeyValue)
+      var adKeyArr = Object.keys(adKeyValue)
       adKeyArr.forEach((key, index) => {
         adParamsDict[index] = {}
         adParamsDict[index].key = adKeyArr[index]
@@ -49,8 +33,8 @@
       })
     }
 
-    const AD_HOST = window.location.host
-    let adPath
+    var AD_HOST = window.location.host
+    var adPath
     if (AD_HOST === 'b2c-ads.hi.com') {
       adPath = 'Tinklabs'
     } else if (AD_HOST === 'ads-uat.handytravel.tech') {
@@ -83,15 +67,15 @@
 
   <script>
     window.onload = () => {
-      let iframe = Array.prototype.slice.call(document.getElementsByTagName("iframe")).splice(0, 5);
+      var iframe = Array.prototype.slice.call(document.getElementsByTagName("iframe")).splice(0, 5);
       // console.log(iframe)
-      let swiperWrapper = document.querySelector('.swiper-wrapper');
-      let swiperContainer = document.querySelector('.swiper-container');
-      let loader = document.querySelector('.loader');
+      var swiperWrapper = document.querySelector('.swiper-wrapper');
+      var swiperContainer = document.querySelector('.swiper-container');
+      var loader = document.querySelector('.loader');
       // console.log(iframe.length, 23333)
-      let swiperSlideBefore = Array.prototype.slice.call(document.querySelectorAll('.swiper-slide'));
+      var swiperSlideBefore = Array.prototype.slice.call(document.querySelectorAll('.swiper-slide'));
 
-      const allHasIframe = swiperSlideBefore.every(item => !!item.querySelector('iframe'))
+      var allHasIframe = swiperSlideBefore.every(item => !!item.querySelector('iframe'))
 
       setTimeout(() => {
         // if ad is empty, there two condition: return iframe width empty body and no return iframe 
@@ -112,7 +96,7 @@
           })
         }
 
-        let swiperSlideAfter = document.querySelector('.swiper-slide');
+        var swiperSlideAfter = document.querySelector('.swiper-slide');
         // console.log(swiperSlideAfter, 1111)
         if (swiperSlideAfter) {
           var swiper = new Swiper('.swiper-container', {
