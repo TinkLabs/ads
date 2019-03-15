@@ -50,8 +50,10 @@
 
     const AD_HOST = window.location.host
     let adPath
-    if (AD_HOST === 'ads.hi.com') {
+    if (AD_HOST === 'b2c-ads.hi.com') {
       adPath = 'Tinklabs'
+    } else if (AD_HOST === 'ads-uat.handytravel.tech') {
+      adPath = 'UAT'
     } else {
       adPath = 'Test'
     }
@@ -158,6 +160,7 @@
       position: relative;
       width: 360px;
       height: 210px;
+      overflow: hidden;
     }
     .swiper-container-horizontal>.swiper-pagination-bullets .swiper-pagination-bullet {
       width: 8px;
