@@ -1,0 +1,412 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>currency</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+
+  <script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
+
+  <script>
+    var googletag = googletag || {};
+    googletag.cmd = googletag.cmd || [];
+  </script>
+
+  <script>
+    const getCookie = name => {
+      //获取name在Cookie中起止位置
+      let start = document.cookie.indexOf(name + "=")
+
+      if (start !== -1) {
+        start = start + name.length + 1
+        //获取value的终止位置
+        let end = document.cookie.indexOf(";", start)
+        if (end === -1)
+          end = document.cookie.length
+        //截获cookie的value值,并返回
+        return unescape(document.cookie.substring(start, end))
+      }
+      return ""
+    }
+
+    // get ad param from android
+    const isAndroid = typeof window.Android !== 'undefined'
+    let hotelId = ''
+    let zoneId = ''
+    let star = ''
+    let country = ''
+    let campaignId = ''
+    let lang = ''
+
+    if (isAndroid && window.Android.getAdKeyValue) {
+      adKeyValue = JSON.parse(window.Android.getAdKeyValue())
+      hotelId = adKeyValue.hotel_id
+      zoneId = adKeyValue.zone_id
+      star = adKeyValue.star
+      country = adKeyValue.country
+      campaignId = adKeyValue.campaign_id
+      lang = adKeyValue.lang
+    }
+
+    console.log('========= hotelId, campaignId, lang, star, country, zoneId', hotelId, campaignId, lang, star, country, zoneId)
+    
+    const AD_HOST = window.location.host
+    let adPath
+    if (AD_HOST === 'ads.hi.com') {
+      adPath = 'Tinklabs'
+    } else {
+      adPath = 'Test'
+    }
+
+    
+    googletag.cmd.push(function() {
+            googletag.defineSlot('/21623654641/Tinklabs/CW-01', [[100,35],[70,35],[35,35]], 'div-gpt-ad-1540870387934-0').addService(googletag.pubads());
+            googletag.pubads().enableSingleRequest();
+            googletag.pubads().setTargeting('country', '86').setTargeting('hotel_id', '7001');
+            //googletag.pubads().setTargeting('country', '//').setTargeting('hotel_id', '//').setTargeting('campaign_id', '//').setTargeting('lang', '//').setTargeting('star', '//');
+            googletag.enableServices();
+        });
+    
+  </script>
+  <!-- Demo styles -->
+<style>
+/* *{
+  margin: 0;
+  padding: 0;
+} */
+*, ::after, ::before {
+    box-sizing: border-box;
+}
+body{
+    margin: 0;
+    font-weight: 400;
+    line-height: 1.5;
+}
+.modal-open {
+    overflow: hidden;
+}
+img {
+    vertical-align: middle;
+    border-style: none;
+}
+button, input, optgroup, select, textarea {
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+button, input {
+    overflow: visible;
+}
+.currency{
+    width: 360px;
+    height: 235px;
+    /*border: 0.5px solid gray;*/
+}
+.currency .converter{
+    height: 173.5px;
+    background-color: rgb(244, 244, 244);
+}
+.converter .title{
+    padding-top: 16px;
+    padding-left: 16.5px;
+    font-size: 17.5px;
+    height: 38px;
+}
+.converter .section{
+    height: 119.5px;
+}
+.converter .section .from{
+    margin-top: 14px;
+    text-align: center;
+    float: left;
+    width: 50%;
+}
+.converter .section .to{
+    margin-top: 14px;
+    text-align: center;
+    float: right;
+    width: 50%;
+}
+.converter .convert{
+    position: absolute;
+    top: 93.5px;
+    left: 163px;
+    width: 32.5px;
+    height: 32.5px;
+    background: url("./convert.jpg");
+}
+.currency .ad{
+    height: 61.5px;
+}
+.currency .update-time{
+    padding-left: 6.8px;
+    padding-top: 6.5px;
+    font-size: 7.5px;
+}
+.currency .adcontent{
+    padding-right: 6.5px;
+    padding-top: 6.5px;
+    font-size: 7.5px;
+    text-align: right;
+}
+.inputRadio {
+    margin-left: 30px;
+}
+.inputRadio span{
+    margin-left: 10px;
+}
+.currency-input{
+    outline: none;
+    background-color: #f4f4f4;
+    border: 0px;
+    border-bottom: solid 1px;
+    width: 150px;
+    padding:1px;
+    font-size: 20px;
+    text-align: center;
+    -webkit-appearance: none;border-radius: 0;
+}
+/* style of selectModel */
+.model-open .model{
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.fade.show {
+    opacity: 1;
+}
+.modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    display: none;
+    overflow: hidden;
+    background: rgba(179, 175, 175);
+    outline: 0;
+}
+.fade {
+    opacity: 0;
+    transition: opacity .15s linear;
+}
+
+.modal.fade .modal-dialog {
+    transition: -webkit-transform .3s ease-out;
+    transition: transform .3s ease-out;
+    transition: transform .3s ease-out,-webkit-transform .3s ease-out;
+    -webkit-transform: translate(0,-25%);
+    transform: translate(0,-25%);
+}
+.modal.show .modal-dialog{
+    -webkit-transform: translate(0,0);
+    transform: translate(0,0);
+}
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: .5rem;
+    pointer-events: none;
+}
+.modal-content {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: .3rem;
+    outline: 0;
+}
+.modal-body {
+    position: relative;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1rem;
+}
+.inputRadio {
+    margin-left: 30px;
+}
+label {
+    display: inline-block;
+    margin-bottom: .5rem;
+}
+input[type=checkbox], input[type=radio] {
+    box-sizing: border-box;
+    padding: 0;
+}
+button, input {
+    overflow: visible;
+}
+.inputRadio span {
+    margin-left: 10px;
+}
+</style>
+</head>
+<body class="model-open">
+  <div class="currency">
+    <div class="converter">
+      <div class="title">Today's Exchange Rate</div>
+      <div class="section">
+        <div class="from" >
+          <div style="border-right: 1px solid rgb(151, 151, 151);margin-top: 19px;">
+            <div id="currency-from" onclick = 'changeCurrency(event)' flag-tag = 'USD'> 
+                <img class="nation-flag" src="https://cdn.handy.travel/ads/images/flags/USD.png" alt width="43.5px" height="29px"/><div id="currency-from-code" style="font-size:10px">USD</div>
+            </div>
+            <input id="currency-from-amount" class="currency-input" value="4342344">
+          </div>
+        </div>
+        <div class="to">
+          <div style="margin-top: 19px;" class="">
+            <div id="currency-to" onclick = 'changeCurrency(event)'>
+                <img class="nation-flag" src="https://cdn.handy.travel/ads/images/flags/GBP.png" alt width="43.5px" height="29px"><div id="currency-to-code" style="font-size:10px">GBP</div>
+            </div>
+            <input id="currency-to-amount" class="currency-input" value="44">
+          </div>
+        </div>
+      </div>
+      <span class="convert"></span>
+    </div>
+    <div class="ad">
+      <div style="width:50%;float: left;">
+          <div class="update-time">Last updated 2019-03-12</div>
+      </div>
+      <div style="width:50%;float: right;">
+        <div class="adcontent">
+          <div>Sponsored by</div>
+          <div style="height:35px; max-width:100px;float: right;">
+              <div id="div-gpt-ad-1540870387934-0" style="height:35px; width:100px;" data-google-query-id="CO6Y3oeZ_OACFdExYAod7poF1Q">
+                  <script>
+                      googletag.cmd.push(function() { googletag.display('div-gpt-ad-1540870387934-0'); });
+                  </script>
+              <div id="google_ads_iframe_/21623654641/Tinklabs/CW-01_0__container__" style="border: 0pt none; width: 100px; height: 35px;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="toSelectModal" class="modal fade" style="display:'none'">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+      var currTimeout;
+      var changeObj;
+       function replaceValue(event){
+        
+            var obj = event.srcElement ? event.srcElement:event.target;
+            currTimeout = setTimeout(() =>{
+                document.getElementById('toSelectModal').classList.remove('show')
+            },200)
+
+            document.getElementById('toSelectModal').style.display ='none'
+           console.log(changeObj);
+            // changeObj.src = 'https://cdn.handy.travel/ads/images/flags/'+ obj.getAttribute('value') + '.png'
+           
+        }
+        function changeCurrency(event){
+           
+            var obj = event.srcElement ? event.srcElement:event.target;
+            changeObj = obj.querySelector('.nation-flag')
+            console.log(obj);
+            document.getElementById('toSelectModal').style.display ='block'
+            
+            document.getElementById('toSelectModal').classList.add('show')
+        }
+    document.addEventListener('DOMContentLoaded', () => {
+        let currencyHtml = '';
+        let currencyUnits = [
+                            {AUD:
+                                {option:'AUD-Australian Dollar'}},
+                            {CAD:
+                                {option:'CAD-Canadian Dollar'}},
+                            {CHF:
+                                {option:'CHF-Swiss Franc'}},
+                            {CNY:
+                                {option:'CNY-Chinese Yuan'}},
+                            {EUR:
+                                {option:'EUR-Euro'}},
+                            {GBP:
+                                {option:'GBP-British Pound'}},
+                            {HKD:
+                                {option:'HKD-Hong Kong Dollar'}},
+                            {IDR:
+                                {option:'IDR-Indonesian Rupiah'}},
+                            {INR:
+                                {option:'INR-Indian Rupee'}},
+                            {JPY:
+                                {option:'JPY-Japanese Yen'}},
+                            {PHP:
+                                {option:'PHP-Philippine Peso'}},
+                            {RUB:
+                                {option:'RUB-Russian Ruble'}},
+                            {SGD:
+                                {option:'SGD-Singapore Dollar'}},
+                            {THB:
+                                {option:'THB-Thai Baht'}},
+                            {USD:
+                                {option:'USD-US Dollar'}}]
+        
+        // let hasUnits = [AUD,CAD,CHF,CNY,EUR,GBP,HKD,IDR,INR,JPY,PHP,RUB,SGD,THB,USD]
+        var showUnits = [];
+
+        document.querySelector('.modal-body').innerHTML = currencyHtml;
+        
+//         function logMapElements(value, key, map) {
+//     console.log("m[" + key + "] = " + value);
+// }
+// currencyUnits.forEach(logMapElements)
+        // document.querySelector('.modal-body')
+        currencyUnits.forEach((element)=>{
+            // console.log(element);
+            currencyHtml += `<div class="inputRadio">
+          <label><input onclick="$('#toSelectModal').modal('hide');" name="currencyto" usdrate="0.753" type="radio" value="GBP">
+            <span>GBP-British Pound</span>
+          </label>
+       </div>`
+        })
+       
+        
+        fetch('https://currency.handy.travel/currencies/USD/rates')
+            .then(res => res.json())
+            .catch(e => {
+                console.log('Error:', e)
+            })
+            .then(data => {
+                if (data) {
+                    showUnits
+                    for(var key in data.data[0].rates){
+                        var rateKey = key;
+                        console.log(rateKey);
+                        for(var key in currencyUnits){
+                            if(key === rateKey){
+                                console.log(currencyUnits[key]);
+                                return;
+                            }
+                        }
+                        // currencyUnits.key
+                        // console.log(currencyUnits[key])
+                    }
+                  
+                    
+                }
+      })
+    })  
+
+  </script>
+</body>
+</html>
