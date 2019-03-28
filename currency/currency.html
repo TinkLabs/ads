@@ -80,8 +80,13 @@
 }
 body{
     margin: 0;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    background-color: #fff;
 }
 .modal-open {
     overflow: hidden;
@@ -260,18 +265,20 @@ button, input {
       <div class="section">
         <div class="from" >
           <div style="border-right: 1px solid rgb(151, 151, 151);margin-top: 19px;">
-            <div id="currency-from" onclick = 'changeCurrency(event)' flag-tag = 'USD'> 
-                <img class="nation-flag" src="https://cdn.handy.travel/ads/images/flags/USD.png" alt width="43.5px" height="29px"/><div id="currency-from-code" style="font-size:10px">USD</div>
-            </div>
-            <input id="currency-from-amount" class="currency-input" value="4342344">
+            <div id="currency-from" flag-tag = 'USD' class="change-target"> 
+                <img class="nation-flag currency-from" onclick = 'changeCurrency(event)' id='nation-flag-from' src="https://cdn.handy.travel/ads/images/flags/USD.png" alt width="43.5px" height="29px"/>
+                <div id="currency-from-code"  style="font-size:10px">USD</div>
+                <input id="currency-from-amount" class="currency-input" curr-rate="" target-rate="" value="1.000" onkeyup="value=value.replace(/[^\d.]/g,'');keyPress(this,'to');">
+        </div>
           </div>
         </div>
         <div class="to">
           <div style="margin-top: 19px;" class="">
-            <div id="currency-to" onclick = 'changeCurrency(event)'>
-                <img class="nation-flag" src="https://cdn.handy.travel/ads/images/flags/GBP.png" alt width="43.5px" height="29px"><div id="currency-to-code" style="font-size:10px">GBP</div>
+            <div id="currency-to" class="change-target">
+                <img class="nation-flag currency-to" id="nation-flag-to"  onclick = 'changeCurrency(event)' src="https://cdn.handy.travel/ads/images/flags/HKD.png" alt width="43.5px" height="29px">
+                <div id="currency-to-code" style="font-size:10px">HKD</div>
+                <input id="currency-to-amount" class="currency-input"  curr-rate="" target-rate="" value="1.000" onkeyup="value=value.replace(/[^\d.]/g,'');keyPress(this,'from');">
             </div>
-            <input id="currency-to-amount" class="currency-input" value="44">
           </div>
         </div>
       </div>
@@ -279,7 +286,7 @@ button, input {
     </div>
     <div class="ad">
       <div style="width:50%;float: left;">
-          <div class="update-time">Last updated 2019-03-12</div>
+          <div class="update-time">Last updated <span id="currentDate"></span></div>
       </div>
       <div style="width:50%;float: right;">
         <div class="adcontent">
@@ -306,81 +313,93 @@ button, input {
   <script>
       var currTimeout;
       var changeObj;
-       function replaceValue(event){
-        
+
+       function replaceValue(event,nationName,curencyRate){
+            
             var obj = event.srcElement ? event.srcElement:event.target;
             currTimeout = setTimeout(() =>{
                 document.getElementById('toSelectModal').classList.remove('show')
             },200)
 
             document.getElementById('toSelectModal').style.display ='none'
-           console.log(changeObj);
-            // changeObj.src = 'https://cdn.handy.travel/ads/images/flags/'+ obj.getAttribute('value') + '.png'
-           
+            changeObj.src=`https://cdn.handy.travel/ads/images/flags/${nationName}.png`
+            changeObj.parentNode.children[1].innerHTML = nationName;
+            changeObj.parentNode.children[2].setAttribute("curr-rate", curencyRate.toFixed(3));
+            
+            //set target-rate
+            var currencyToObj = document.getElementById('currency-to-amount')
+            var currencyFromObj = document.getElementById('currency-from-amount')
+
+            var fromRate = parseFloat(currencyToObj.getAttribute("curr-rate")) / parseFloat(currencyFromObj.getAttribute("curr-rate"))
+            var toRate  = parseFloat(currencyFromObj.getAttribute("curr-rate")) / parseFloat(currencyToObj.getAttribute("curr-rate"))
+
+            currencyFromObj.setAttribute("target-rate", fromRate.toFixed(3));
+            currencyToObj.setAttribute("target-rate", toRate.toFixed(3));
+
+           //reset changeObj's value
+           var changeTargetObj = document.querySelector('.change-target')
+        
+           var targetValue = parseFloat(changeTargetObj.children[2].value)
+           var targetRate = parseFloat(changeTargetObj.children[2].getAttribute("target-rate"))
+           changeObj.parentNode.children[2].value = (targetValue * targetRate).toFixed(3)
+           changeObj.parentNode.classList.add('change-target')
+
+        }
+
+        function keyPress(currObj,replaceObj){
+            var targetOBj = document.getElementById('currency-'+replaceObj+'-amount')
+            var targetRate = parseFloat(currObj.getAttribute("target-rate"));
+            var currValue = parseFloat(currObj.value);
+            targetOBj.value = (targetRate * currValue ).toFixed(3)
+            
         }
         function changeCurrency(event){
            
             var obj = event.srcElement ? event.srcElement:event.target;
-            changeObj = obj.querySelector('.nation-flag')
-            console.log(obj);
+            changeObj = obj
+            obj.parentNode.classList.remove('change-target')
             document.getElementById('toSelectModal').style.display ='block'
             
             document.getElementById('toSelectModal').classList.add('show')
         }
     document.addEventListener('DOMContentLoaded', () => {
         let currencyHtml = '';
-        let currencyUnits = [
-                            {AUD:
-                                {option:'AUD-Australian Dollar'}},
-                            {CAD:
-                                {option:'CAD-Canadian Dollar'}},
-                            {CHF:
-                                {option:'CHF-Swiss Franc'}},
-                            {CNY:
-                                {option:'CNY-Chinese Yuan'}},
-                            {EUR:
-                                {option:'EUR-Euro'}},
-                            {GBP:
-                                {option:'GBP-British Pound'}},
-                            {HKD:
-                                {option:'HKD-Hong Kong Dollar'}},
-                            {IDR:
-                                {option:'IDR-Indonesian Rupiah'}},
-                            {INR:
-                                {option:'INR-Indian Rupee'}},
-                            {JPY:
-                                {option:'JPY-Japanese Yen'}},
-                            {PHP:
-                                {option:'PHP-Philippine Peso'}},
-                            {RUB:
-                                {option:'RUB-Russian Ruble'}},
-                            {SGD:
-                                {option:'SGD-Singapore Dollar'}},
-                            {THB:
-                                {option:'THB-Thai Baht'}},
-                            {USD:
-                                {option:'USD-US Dollar'}}]
-        
-        // let hasUnits = [AUD,CAD,CHF,CNY,EUR,GBP,HKD,IDR,INR,JPY,PHP,RUB,SGD,THB,USD]
-        var showUnits = [];
+        let currencyUnits = {data:
+                                {
+                                    AUD:
+                                        {option:'AUD-Australian Dollar'},
+                                    CAD:
+                                        {option:'CAD-Canadian Dollar'},
+                                    CHF:
+                                        {option:'CHF-Swiss Franc'},
+                                    CNY:
+                                        {option:'CNY-Chinese Yuan'},
+                                    EUR:
+                                        {option:'EUR-Euro'},
+                                    GBP:
+                                        {option:'GBP-British Pound'},
+                                    HKD:
+                                        {option:'HKD-Hong Kong Dollar'},
+                                    IDR:
+                                        {option:'IDR-Indonesian Rupiah'},
+                                    INR:
+                                        {option:'INR-Indian Rupee'},
+                                    JPY:
+                                        {option:'JPY-Japanese Yen'},
+                                    PHP:
+                                        {option:'PHP-Philippine Peso'},
+                                    RUB:
+                                        {option:'RUB-Russian Ruble'},
+                                    SGD:
+                                        {option:'SGD-Singapore Dollar'},
+                                    THB:
+                                        {option:'THB-Thai Baht'},
+                                    USD:
+                                        {option:'USD-US Dollar'}
+                                }
+                            }
 
-        document.querySelector('.modal-body').innerHTML = currencyHtml;
-        
-//         function logMapElements(value, key, map) {
-//     console.log("m[" + key + "] = " + value);
-// }
-// currencyUnits.forEach(logMapElements)
-        // document.querySelector('.modal-body')
-        currencyUnits.forEach((element)=>{
-            // console.log(element);
-            currencyHtml += `<div class="inputRadio">
-          <label><input onclick="$('#toSelectModal').modal('hide');" name="currencyto" usdrate="0.753" type="radio" value="GBP">
-            <span>GBP-British Pound</span>
-          </label>
-       </div>`
-        })
-       
-        
+
         fetch('https://currency.handy.travel/currencies/USD/rates')
             .then(res => res.json())
             .catch(e => {
@@ -388,20 +407,51 @@ button, input {
             })
             .then(data => {
                 if (data) {
-                    showUnits
-                    for(var key in data.data[0].rates){
+                    var dataRates = data.data[0].rates
+
+                    //set currency base
+                    document.getElementById('currency-from-code').innerHTML = data.data[0].base;
+                    document.getElementById('currency-from-amount').setAttribute("curr-rate", dataRates[data.data[0].base].toFixed(3));
+                    document.getElementById('currency-from-amount').value = dataRates[data.data[0].base].toFixed(3)
+                    document.getElementById('nation-flag-from').src=`https://cdn.handy.travel/ads/images/flags/${data.data[0].base}.png`
+
+                    //set initial data
+                    var initialCurrency  = 'HKD';
+                    document.getElementById('currency-to-code').innerHTML = initialCurrency;
+                    document.getElementById('currency-to-amount').setAttribute("curr-rate", dataRates[initialCurrency].toFixed(3));
+                    document.getElementById('currency-to-amount').value = dataRates[initialCurrency].toFixed(3)
+                    document.getElementById('nation-flag-to').src=`https://cdn.handy.travel/ads/images/flags/HKD.png`
+
+                    //set target-rate
+                    var fromRate = ( dataRates[initialCurrency] /dataRates[data.data[0].base])
+                    var toRate = (dataRates[data.data[0].base] / dataRates[initialCurrency]) 
+                    document.getElementById('currency-from-amount').setAttribute("target-rate", fromRate.toFixed(3));
+                    document.getElementById('currency-to-amount').setAttribute("target-rate", toRate.toFixed(3));
+
+                    document.getElementById('currentDate').innerHTML = data.data[0].date
+
+                    
+                    for(var key in dataRates){
                         var rateKey = key;
-                        console.log(rateKey);
-                        for(var key in currencyUnits){
+                        
+                        // console.log(rateKey);
+                        for(var key in currencyUnits.data){
+                           
                             if(key === rateKey){
-                                console.log(currencyUnits[key]);
-                                return;
+                                
+                                currencyHtml += `<div class="inputRadio">
+                                        <label>
+                                            <input onclick=replaceValue(event,'${key}',${dataRates[key]}) name="currencyto" currRate=${dataRates[key]} type="radio" value=${key}>
+                                            <span>${currencyUnits.data[key].option}</span>
+                                        </label>
+                                    </div>`
+                                
                             }
                         }
-                        // currencyUnits.key
-                        // console.log(currencyUnits[key])
+                       
                     }
-                  
+
+                   document.querySelector('.modal-body').innerHTML = currencyHtml;
                     
                 }
       })
