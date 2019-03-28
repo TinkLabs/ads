@@ -267,8 +267,8 @@ button, input {
           <div style="border-right: 1px solid rgb(151, 151, 151);margin-top: 19px;">
             <div id="currency-from" flag-tag = 'USD' class="change-target"> 
                 <img class="nation-flag currency-from" onclick = 'changeCurrency(event)' id='nation-flag-from' src="https://cdn.handy.travel/ads/images/flags/USD.png" alt width="43.5px" height="29px"/>
-                <div id="currency-from-code"  style="font-size:10px">USD</div>
-                <input id="currency-from-amount" class="currency-input" curr-rate="" target-rate="" value="1.000" onkeyup="value=value.replace(/[^\d.]/g,'');keyPress(this,'to');">
+                <div id="currency-from-code"  style="font-size:10px"></div>
+                <input id="currency-from-amount" class="currency-input" curr-rate="" target-rate="" value="" onkeyup="value=value.replace(/[^\d.]/g,'');keyPress(this,'to');">
         </div>
           </div>
         </div>
@@ -276,8 +276,8 @@ button, input {
           <div style="margin-top: 19px;" class="">
             <div id="currency-to" class="change-target">
                 <img class="nation-flag currency-to" id="nation-flag-to"  onclick = 'changeCurrency(event)' src="https://cdn.handy.travel/ads/images/flags/HKD.png" alt width="43.5px" height="29px">
-                <div id="currency-to-code" style="font-size:10px">HKD</div>
-                <input id="currency-to-amount" class="currency-input"  curr-rate="" target-rate="" value="1.000" onkeyup="value=value.replace(/[^\d.]/g,'');keyPress(this,'from');">
+                <div id="currency-to-code" style="font-size:10px"></div>
+                <input id="currency-to-amount" class="currency-input"  curr-rate="" target-rate="" value="" onkeyup="value=value.replace(/[^\d.]/g,'');keyPress(this,'from');">
             </div>
           </div>
         </div>
