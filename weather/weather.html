@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+<title>weather-templete</title>
+<script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
+</head>
+<body>
+<style>
+*{
+    margin:0;
+    padding:0;
+}
+.weather-box{
+    width:360px;
+    height:183px;
+    /* margin-top:50px; */
+    background: url('https://cdn.handy.travel/ads/images/drawable-mdpi/bg28.png') 
+}
+.weather-header{
+    height:calc(101.5px - 26px);
+    padding:13px  12px;
+    overflow: hidden;
+}
+.header-content{
+    float:left;
+    height: inherit;
+    text-align: right;
+    width:50%;
+}
+.header-content .cf-toggle{
+    width: 89px;
+    height: 26.5px;
+}
+.header-content .cf-toggle .temperature-unit{
+    width: 50%;
+    height: 26.5px;
+    display: inline-block;
+    text-align: center;
+    font-size: 15px;
+    color: rgb(0, 0, 0);
+    background-color:rgb(255, 255, 255) ;
+    font-family: "sans-serif-medium";
+    line-height: 26.5px;
+}
+.header-content .cf-toggle .curr-unit{
+    color: rgb(255, 255, 255);
+    background-color: rgb(0, 0, 0);
+}
+.header-content .today-data span{
+    display: inline-block;
+    font-size: 10px;
+    color: #fff;
+    font-weight: bolder;
+}
+.header-content .today-temperation img{
+    
+    max-width: 35px;
+    max-height: 35px;
+    margin-right: 3px;
+}
+.header-content .today-temperation{
+    margin-top:3px;
+    line-height: 35px;
+}
+.header-content .today-temperation span{
+    font-size: 35px;
+    color: #fff;
+    
+}
+.header-content .curr-location span{
+    font-size: 10px;
+    color: #fff;
+    
+    
+}
+.weather-footer{
+    overflow: hidden;
+    zoom: 1;
+    height:81.5px;
+    background-color: rgb(42,50,60);
+}
+.weathe-item ul li{
+    list-style-type: none
+}
+.weathe-item{
+    float:left;
+    width:calc(100% / 6)
+}
+.weathe-item ul li{
+    text-align: center;
+    color: #fff;
+}
+.weathe-item ul li span{
+    font-size: 7px;
+}
+
+.weathe-item ul li .weather-forecast-tmpl{
+    color: rgba(255,255,255,0.5);
+}
+.weathe-item ul li img{
+    height:35.5px;
+    /* width:60px; */
+}
+.weathe-item ul li:nth-child(2){
+    height:35.5px;
+    background-position-x: center
+}
+.weathe-item ul li:nth-child(2){
+    background-repeat:  no-repeat;
+    background-position:center;
+}
+
+</style>
+
+<script>
+    var googletag = googletag || {};
+    googletag.cmd = googletag.cmd || [];
+</script>
+    
+<script>
+    const getCookie = name => {
+        //获取name在Cookie中起止位置
+        let start = document.cookie.indexOf(name + "=")
+
+        if (start !== -1) {
+        start = start + name.length + 1
+        //获取value的终止位置
+        let end = document.cookie.indexOf(";", start)
+        if (end === -1)
+            end = document.cookie.length
+        //截获cookie的value值,并返回
+        return unescape(document.cookie.substring(start, end))
+        }
+        return ""
+    }
+
+    // get ad param from android
+    const isAndroid = typeof window.Android !== 'undefined'
+    let hotelId = ''
+    let zoneId = ''
+    let star = ''
+    let country = ''
+    let campaignId = ''
+    let lang = ''
+
+    if (isAndroid && window.Android.getAdKeyValue) {
+        adKeyValue = JSON.parse(window.Android.getAdKeyValue())
+        hotelId = adKeyValue.hotel_id
+        zoneId = adKeyValue.zone_id
+        star = adKeyValue.star
+        country = adKeyValue.country
+        campaignId = adKeyValue.campaign_id
+        lang = adKeyValue.lang
+    }
+
+    console.log('========= hotelId, campaignId, lang, star, country, zoneId', hotelId, campaignId, lang, star, country, zoneId)
+
+    const AD_HOST = window.location.host
+    let adPath
+    if (AD_HOST === 'ads.hi.com') {
+        adPath = 'Tinklabs'
+    } else {
+        adPath = 'Test'
+    }
+    googletag.cmd.push(function() {
+            googletag.defineSlot('/21623654641/Tinklabs/WW-01', [[360, 60]], 'div-gpt-ad-1539583823874-0')
+                .addService(googletag.pubads())
+                .setCollapseEmptyDiv(true,true);
+            googletag.pubads().enableSingleRequest();
+            var c = "86";
+            var z = "111";
+            var h = "7001";
+            googletag.pubads().setTargeting('country', c).setTargeting('hotel_id', h).setTargeting('zone_id', z);
+            //googletag.pubads().collapseEmptyDivs();
+            googletag.enableServices();
+        });
+
+    // googletag.cmd.push(function () {
+    //     googletag.defineSlot(`/21623654641/${adPath}/WW-01`, [360, 363], 'div-gpt-ad-1539583823874-0').addService(
+    //     googletag.pubads());
+
+    //     googletag.pubads().enableSingleRequest();
+    //     googletag.enableServices();
+    //     googletag.pubads().collapseEmptyDivs();
+    //     if (hotelId) {
+    //     googletag.pubads().setTargeting('country', [country]).setTargeting('zone_id', [zoneId]).setTargeting('star', [star]).setTargeting('hotel_id', [hotelId]).setTargeting('lang', [lang]).setTargeting('campaign_id', [campaignId]);
+    //     }else{
+    //     googletag.pubads().setTargeting('country', ['46']).setTargeting('zone_id', ['395']).setTargeting('star', ['1']).setTargeting('hotel_id', ['5700']).setTargeting('lang', ['en_GB']).setTargeting('campaign_id', ['0']);
+    //     }
+    //     // console.log(googletag.pubads());
+
+    // });
+</script>
+
+
+
+<div id="app">
+
+  <!-- <p>{{ message }}</p> -->
+
+  <div class="weather-box">
+        <div class="weather-header">
+            <div class="header-content weather-header-left">
+                <div class="cf-toggle">
+                    <span class="temperature-unit" onclick="unitChange(event)" >°C</span><span class="temperature-unit curr-unit" data-unit="°F" onclick="unitChange(event)">°F</span>
+                </div>
+            </div>
+            <div class="header-content weather-header-right">
+                <div class="today-data">
+                    <span class="today-msg">Today</span>
+                </div>
+                <div class="today-temperation">
+                    <img class="today-img" alt>
+                    <span class="temperature-value"></span>
+                </div>
+                <div class="curr-location">
+                    <span class="weather-location"></span>
+                </div>
+            </div>
+        </div>
+        <div class="weather-footer">
+            <div class="weathe-item">
+                <ul class="forecast-item">
+                    <li>
+                        <span class="date-msg"></span>
+                    </li>
+                    <li class="weather-img"></li>
+                    <li class="temperature-item">
+                        <span class="weather-forecast-tmph temperature-value"></span>
+                        <span class="weather-forecast-tmpl temperature-value"></span>
+                    </li>
+                </ul>
+            </div>
+            <div class="weathe-item">
+                <ul class="forecast-item">
+                    <li>
+                        <span class="date-msg"></span>
+                    </li>
+                    <li class="weather-img"></li>
+                    <li class="temperature-item">
+                        <span class="weather-forecast-tmph temperature-value"></span>
+                        <span class="weather-forecast-tmpl temperature-value"></span>
+                    </li>
+                </ul>
+            </div>
+            <div class="weathe-item">
+                <ul class="forecast-item">
+                    <li>
+                        <span class="date-msg"></span>
+                    </li>
+                    <li class="weather-img"></li>
+                    <li class="temperature-item">
+                        <span class="weather-forecast-tmph temperature-value"></span>
+                        <span class="weather-forecast-tmpl temperature-value"></span>
+                    </li>
+                </ul>
+            </div>
+            <div class="weathe-item">
+                <ul class="forecast-item">
+                    <li>
+                        <span class="date-msg"></span>
+                    </li>
+                    <li class="weather-img"></li>
+                    <li class="temperature-item">
+                        <span class="weather-forecast-tmph temperature-value"></span>
+                        <span class="weather-forecast-tmpl temperature-value"></span>
+                    </li>
+                </ul>
+            </div>
+            <div class="weathe-item">
+                <ul class="forecast-item">
+                    <li>
+                        <span class="date-msg"></span>
+                    </li>
+                    <li class="weather-img"></li>
+                    <li class="temperature-item">
+                        <span class="weather-forecast-tmph temperature-value"></span>
+                        <span class="weather-forecast-tmpl temperature-value"></span>
+                    </li>
+                </ul>
+            </div> 
+            <div class="weathe-item">
+                <ul class="forecast-item">
+                    <li>
+                        <span class="date-msg"></span>
+                    </li>
+                    <li class="weather-img"></li>
+                    <li class="temperature-item">
+                        <span class="weather-forecast-tmph temperature-value" ></span>
+                        <span class="weather-forecast-tmpl temperature-value"></span>
+                    </li>
+                </ul>
+            </div> 
+           
+        </div>
+  </div>
+  <div class="ad-box" style="margin-top:10px;">
+        <div id='div-gpt-ad-1539583823874-0' styl="width:360px;height:363px;overflow-x: hidden;">
+                <script>
+                googletag.cmd.push(function () {
+                    googletag.display('div-gpt-ad-1539583823874-0');
+                });
+                </script>
+            </div>
+  </div>
+</div>
+
+<script>
+    var value_elements = document.querySelectorAll('.temperature-value');
+    var curr_unit = '°C';
+    function unitChange(event){
+        event =event ? event : window.event;
+        var obj = event.srcElement ? event.srcElement:event.target;
+        
+     
+        document.querySelector('.curr-unit').classList.remove("curr-unit")
+        obj.classList.add("curr-unit")
+
+        if(obj.innerHTML === '°F' && curr_unit === '°C'){
+            curr_unit = '°F';
+            value_elements.forEach(element => {
+               
+                element.innerHTML = element.getAttribute('data-temf')
+                
+            });
+
+        }else if(obj.innerHTML === '°C' && curr_unit === '°F'){
+            curr_unit = '°C';
+            value_elements.forEach(element => {
+                element.innerHTML = element.getAttribute('data-temc')
+            });
+        }
+       
+
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const forcast_items = document.querySelectorAll('.forecast-item')
+        const temperature_items = document.querySelectorAll('.temperature-item')
+        
+        fetch('https://staging.handy.travel/apis/get_weather_info?_barcode=355655090012297')
+            .then(res => res.json())
+            .catch(e => {
+                console.log('Error:', e)
+            })
+            .then(data => {
+                if (data) {
+                   let today_temperature_obj = document.querySelector('.today-temperation').querySelector('.temperature-value')
+                    //set today msg
+                    document.querySelector('.today-img').src="https://cdn.handy.travel/ads/images/drawable-mdpi/" + data.current.code +".png" //
+                    document.querySelector('.weather-location').innerHTML = data.location
+                    
+                    today_temperature_obj.innerHTML = data.current.temp_c + '°C'
+                    today_temperature_obj.setAttribute('data-temc',data.current.temp_c + '°C')
+                    today_temperature_obj.setAttribute('data-temf',data.current.temp_f + '°F')
+
+                    forcast_items.forEach((element,index) => {
+                        
+                        let items_li = element.getElementsByTagName('li');
+                        
+                        items_li[0].querySelector('.date-msg').innerHTML = data.forecast[index].day
+                        items_li[1].style.backgroundImage = 'url(https://cdn.handy.travel/ads/images/drawable-mdpi/'+data.forecast[index].code+'.png)'
+                        let tmph_obj = items_li[2].querySelector('.weather-forecast-tmph');
+                        tmph_obj.innerHTML = data.forecast[index].high_c + '°C'
+                        tmph_obj.setAttribute('data-temc',data.forecast[index].high_c + '°C');
+                        tmph_obj.setAttribute('data-temf',data.forecast[index].high_f + '°F');
+
+                        let tmpl_obj = items_li[2].querySelector('.weather-forecast-tmpl');
+                        tmpl_obj.innerHTML = data.forecast[index].low_c + '°C'
+                        tmpl_obj.setAttribute('data-temc',data.forecast[index].low_c + '°C');
+                        tmpl_obj.setAttribute('data-temf',data.forecast[index].low_f + '°F');
+                    
+            });
+
+                }
+      })
+    })  
+
+</script>
+</body>
+</html>
