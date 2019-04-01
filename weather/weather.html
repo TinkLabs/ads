@@ -19,8 +19,8 @@
     background: url('https://cdn.handy.travel/ads/images/drawable-mdpi/bg28.png') 
 }
 .weather-header{
-    height:calc(101.5px - 30px);
-    padding:15px  12px;
+    height:calc(101.5px - 26px);
+    padding:13px  12px;
     overflow: hidden;
 }
 .header-content{
@@ -61,7 +61,8 @@
     margin-right: 3px;
 }
 .header-content .today-temperation{
-    line-height: 46px;
+    margin-top:3px;
+    line-height: 35px;
 }
 .header-content .today-temperation span{
     font-size: 35px;
@@ -313,14 +314,14 @@
         event =event ? event : window.event;
         var obj = event.srcElement ? event.srcElement:event.target;
         
-
+     
         document.querySelector('.curr-unit').classList.remove("curr-unit")
-        obj.add("curr-unit")
+        obj.classList.add("curr-unit")
 
         if(obj.innerHTML === '°F' && curr_unit === '°C'){
             curr_unit = '°F';
             value_elements.forEach(element => {
-                // console.log(element);
+               
                 element.innerHTML = element.getAttribute('data-temf')
                 
             });
@@ -331,32 +332,13 @@
                 element.innerHTML = element.getAttribute('data-temc')
             });
         }
-        // console.log(obj.innerHTML);
+       
 
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         const forcast_items = document.querySelectorAll('.forecast-item')
         const temperature_items = document.querySelectorAll('.temperature-item')
-        // const temperature_items = document.querySelectorAll('.date-msg')
-        // let weatherHtml =''
-        // for(let i=0;i<6;i++){
-
-        //     weatherHtml += `<div class="weathe-item">
-        //                 <ul class="forecast-item">
-        //                     <li>
-        //                         <span class="date-msg"></span>
-        //                     </li>
-        //                     <li class="weather-img"></li>
-        //                     <li class="temperature-item">
-        //                         <span class="weather-forecast-tmph temperature-value"></span>
-        //                         <span class="weather-forecast-tmpl temperature-value"></span>
-        //                     </li>
-        //                 </ul>
-        //             </div>`
-
-        // }
-        // document.querySelector('.weather-footer').innerHTML = weatherHtml;
         
         fetch('https://staging.handy.travel/apis/get_weather_info?_barcode=355655090012297')
             .then(res => res.json())

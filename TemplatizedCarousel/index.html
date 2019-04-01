@@ -5,8 +5,8 @@
   <meta charset="utf-8">
   <title>Carousel AD</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-
-  <script async='async' src='//static.amp.services/clients/DFPNetwork/Client.js'></script>
+  <script async="async" src="https://www.googletagservices.com/tag/js/gpt.js"></script>
+  <!-- <script async='async' src='//static.amp.services/clients/DFPNetwork/Client.js'></script> -->
   <!-- <script async='async' src='gpt.js'></script> -->
   <script>
     var googletag = googletag || {};
@@ -14,7 +14,7 @@
   </script>
 
   <script>
-    const getCookie = name => {
+    var getCookie = name => {
       //获取name在Cookie中起止位置
       let start = document.cookie.indexOf(name + "=")
 
@@ -51,7 +51,7 @@
 
     console.log('========= hotelId, campaignId, lang, star, country, zoneId', hotelId, campaignId, lang, star, country, zoneId)
     
-    const AD_HOST = window.location.host
+    var AD_HOST = window.location.host
     let adPath
     if (AD_HOST === 'ads.hi.com') {
       adPath = 'Tinklabs'
@@ -65,13 +65,21 @@
 
       googletag.pubads().enableSingleRequest();
       googletag.enableServices();
+
       googletag.pubads().collapseEmptyDivs();
       if (hotelId) {
         googletag.pubads().setTargeting('country', [country]).setTargeting('zone_id', [zoneId]).setTargeting('star', [star]).setTargeting('hotel_id', [hotelId]).setTargeting('lang', [lang]).setTargeting('campaign_id', [campaignId]);
       }else{
         googletag.pubads().setTargeting('country', ['46']).setTargeting('zone_id', ['395']).setTargeting('star', ['1']).setTargeting('hotel_id', ['5700']).setTargeting('lang', ['en_GB']).setTargeting('campaign_id', ['0']).setTargeting('contentUrl', ['@ href ="https://b2c-homepage.handy.travel/index.html?handyZone=Hong%20Kong#/home"']);
       }
-      // console.log(googletag.pubads());
+
+      googletag.pubads().addEventListener('slotRequested', () => {
+        document.querySelector('#div-gpt-ad-1547119989301-0').style.display = 'none'
+      })
+
+      googletag.pubads().addEventListener('slotOnload', () => {
+        document.querySelector('#div-gpt-ad-1547119989301-0').style.display = 'block'
+      })
 
     });
   </script>
