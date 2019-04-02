@@ -97,6 +97,7 @@
 
       // slot has rendered but ad not loaded completely
       googletag.pubads().addEventListener('slotRenderEnded', (e) => {
+        console.log('carousel slotRenderEnded')
         var currentId = e.slot.getSlotElementId()
         // remove emplty ad
         if (e.isEmpty) {
@@ -106,6 +107,7 @@
 
       // ad has loaded completely
       googletag.pubads().addEventListener('slotOnload', (e) => {
+        console.log('carousel slotOnload')
         // init swiper, just init once
         if (!isFirstLoad) {
           var swiperSlideAfter = [...document.querySelectorAll('.swiper-slide')];
