@@ -13,6 +13,7 @@
   <script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
 
   <script>
+    window.top.postMessage( {test: 11111}, '*');
     var googletag = googletag || {};
     googletag.cmd = googletag.cmd || [];
   </script>
@@ -92,12 +93,14 @@
     googletag.cmd.push(function () {
       // judge if first ad load completely
       var isFirstLoad = false
-      var swiperContainer = document.querySelector('.swiper-container');
-      var swiperWrapper = document.querySelector('.swiper-wrapper');
+      var swiperWrapper = document.querySelector('.swiper-wrapper')
 
       // slot has rendered but ad not loaded completely
       googletag.pubads().addEventListener('slotRenderEnded', (e) => {
-        console.log('carousel slotRenderEnded')
+        // console.log('carousel slotRenderEnded')
+        if (!swiperWrapper) {
+          swiperWrapper = document.querySelector('.swiper-wrapper');
+        }
         var currentId = e.slot.getSlotElementId()
         // remove emplty ad
         if (e.isEmpty) {
@@ -107,7 +110,7 @@
 
       // ad has loaded completely
       googletag.pubads().addEventListener('slotOnload', (e) => {
-        console.log('carousel slotOnload')
+        // console.log('carousel slotOnload')
         // init swiper, just init once
         if (!isFirstLoad) {
           var swiperSlideAfter = [...document.querySelectorAll('.swiper-slide')];
@@ -129,6 +132,9 @@
               },
             });
           }
+
+          // send data to top window
+          window.top.postMessage( {isCarouselLoad: true}, '*');
         }
         isFirstLoad = true
 
