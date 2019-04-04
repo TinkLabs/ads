@@ -23,7 +23,8 @@
     var adParamsDict = []
 
     if (isAndroid && window.Android.getAdKeyValue) {
-      adKeyValue = JSON.parse(window.Android.getAdKeyValue())
+      var adKeyValue = JSON.parse(window.Android.getAdKeyValue())
+      console.log('getAdKeyValue', window.Android.getAdKeyValue())
 
       var adKeyArr = Object.keys(adKeyValue)
       adKeyArr.forEach((key, index) => {
