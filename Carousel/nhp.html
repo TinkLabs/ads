@@ -134,19 +134,33 @@
           }
 
           // send data to top window
-          window.top.postMessage( {isCarouselLoad: true}, '*');
+          window.top.postMessage( {isCarouselFirstLoad: true}, '*');
         }
         isFirstLoad = true
 
         // change img size
         var currentId = e.slot.getSlotElementId()
-        var currentAdFrame = document.querySelector(`#${currentId}`).querySelector('iframe')
-        var img = currentAdFrame.contentWindow.document.querySelector('.i-amphtml-layout-fixed')
+        var currentIndex = currentId.slice(currentId.length - 1)
+        var currentAdFrameDoc = document.querySelector(`#${currentId}`).querySelector('iframe').contentWindow.document
+        var img = currentAdFrameDoc.querySelector('.i-amphtml-layout-fixed')
         if (!img) {
-          img = currentAdFrame.contentWindow.document.querySelector('img')
+          img = currentAdFrameDoc.querySelector('img')
         }
         img.style.width = '336px'
         img.style.height = '196px'
+
+         // send data to top window for ad impression
+         window.top.postMessage( {
+            isCarouselLoad: true,
+            index: currentIndex,
+          }, '*');
+        // send data to top window for ad click mixpanel
+        currentAdFrameDoc.getElementsByTagName("html")[0].addEventListener('click', () => {
+          window.top.postMessage( {
+            isCarouselClick: true,
+            index: currentIndex,
+          }, '*');
+        }, true)
       });
     })
   </script>
