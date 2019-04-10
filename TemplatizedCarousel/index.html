@@ -31,22 +31,18 @@
     }
 
     // get ad param from android
-    const isAndroid = typeof window.Android !== 'undefined'
-    let hotelId = ''
-    let zoneId = ''
-    let star = ''
-    let country = ''
-    let campaignId = ''
-    let lang = ''
+    var isAndroid = typeof window.Android !== 'undefined'
+    var adParamsDict = []
 
     if (isAndroid && window.Android.getAdKeyValue) {
       adKeyValue = JSON.parse(window.Android.getAdKeyValue())
-      hotelId = adKeyValue.hotel_id
-      zoneId = adKeyValue.zone_id
-      star = adKeyValue.star
-      country = adKeyValue.country
-      campaignId = adKeyValue.campaign_id
-      lang = adKeyValue.lang
+
+       var adKeyArr = Object.keys(adKeyValue)
+        adKeyArr.forEach((key, index) => {
+          adParamsDict[index] = {}
+          adParamsDict[index].key = adKeyArr[index]
+          adParamsDict[index].value = adKeyValue[adKeyArr[index]]
+        })
     }
 
     console.log('========= hotelId, campaignId, lang, star, country, zoneId', hotelId, campaignId, lang, star, country, zoneId)
@@ -70,7 +66,7 @@
       if (hotelId) {
         googletag.pubads().setTargeting('country', [country]).setTargeting('zone_id', [zoneId]).setTargeting('star', [star]).setTargeting('hotel_id', [hotelId]).setTargeting('lang', [lang]).setTargeting('campaign_id', [campaignId]);
       }else{
-        googletag.pubads().setTargeting('country', ['46']).setTargeting('zone_id', ['395']).setTargeting('star', ['1']).setTargeting('hotel_id', ['5700']).setTargeting('lang', ['en_GB']).setTargeting('campaign_id', ['0']).setTargeting('contentUrl', ['@ href ="https://b2c-homepage.handy.travel/index.html?handyZone=Hong%20Kong#/home"']);
+        googletag.pubads().setTargeting('country', ['100']).setTargeting('zone_id', ['3']).setTargeting('star', ['0']).setTargeting('hotel_id', ['5707']).setTargeting('lang', ['en_GB']).setTargeting('campaign_id', ['0']);
       }
 
       googletag.pubads().addEventListener('slotOnload', () => {
@@ -98,6 +94,8 @@ body{
             googletag.display('div-gpt-ad-1547119989301-0');
         });
         </script>
+
+        
     </div>
 </body>
 </html>
