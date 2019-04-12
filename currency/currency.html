@@ -30,31 +30,34 @@
       return ""
     }
 
-    // get ad param from android
-    const isAndroid = typeof window.Android !== 'undefined'
-    let hotelId = ''
-    let zoneId = ''
-    let star = ''
-    let country = ''
-    let campaignId = ''
-    let lang = ''
+     // get ad param from android
+     var isAndroid = typeof window.Android !== 'undefined'
+    var adParamsDict = []
 
     if (isAndroid && window.Android.getAdKeyValue) {
       adKeyValue = JSON.parse(window.Android.getAdKeyValue())
-      hotelId = adKeyValue.hotel_id
-      zoneId = adKeyValue.zone_id
-      star = adKeyValue.star
-      country = adKeyValue.country
-      campaignId = adKeyValue.campaign_id
-      lang = adKeyValue.lang
+    } else {
+      // this default params var browser can see ad
+      adKeyValue = {
+        hotel_id: 3747,
+        campaign_id: 20190218,
+      }
     }
 
-    console.log('========= hotelId, campaignId, lang, star, country, zoneId', hotelId, campaignId, lang, star, country, zoneId)
+    var adKeyArr = Object.keys(adKeyValue)
+    adKeyArr.forEach((key, index) => {
+      adParamsDict[index] = {}
+      adParamsDict[index].key = adKeyArr[index]
+      adParamsDict[index].value = adKeyValue[adKeyArr[index]]
+    })
     
-    const AD_HOST = window.location.host
+    var AD_HOST = window.location.host
     let adPath
-    if (AD_HOST === 'ads.hi.com') {
+
+    if (AD_HOST === 'b2c-ads.hi.com') {
       adPath = 'Tinklabs'
+    } else if (AD_HOST === 'ads-uat.handytravel.tech') {
+      adPath = 'UAT'
     } else {
       adPath = 'Test'
     }
@@ -63,8 +66,12 @@
     googletag.cmd.push(function() {
             googletag.defineSlot('/21623654641/Tinklabs/CW-01', [[100,35],[70,35],[35,35]], 'div-gpt-ad-1540870387934-0').addService(googletag.pubads());
             googletag.pubads().enableSingleRequest();
-            googletag.pubads().setTargeting('country', '86').setTargeting('hotel_id', '7001');
-            //googletag.pubads().setTargeting('country', '//').setTargeting('hotel_id', '//').setTargeting('campaign_id', '//').setTargeting('lang', '//').setTargeting('star', '//');
+
+            // dynamic set google ad params
+            adParamsDict.forEach(item => {
+                googletag.pubads().setTargeting(item.key, [item.value])
+            })
+
             googletag.enableServices();
         });
     
@@ -256,6 +263,20 @@ button, input {
 .inputRadio span {
     margin-left: 10px;
 }
+.fade.show{
+  position: absolute;
+  -webkit-animation: modeDialog .2s linear; 
+  animation: modeDialog .2s linear;
+  
+}
+
+@keyframes modeDialog{
+    0%   {top: -30px;}
+    25%  {top: -20px;}
+    75%  {top: -5px}
+    100% {top: 0px;}
+}
+
 </style>
 </head>
 <body class="model-open">
@@ -386,6 +407,12 @@ button, input {
                                         {option:'INR-Indian Rupee'},
                                     JPY:
                                         {option:'JPY-Japanese Yen'},
+                                    KRW:
+                                        {option:'South Korean Won'},
+                                    MYR:
+                                        {option:'Malaysian Ringgit'},
+                                    NZD:
+                                        {option:'New Zealand Dollar'},
                                     PHP:
                                         {option:'PHP-Philippine Peso'},
                                     RUB:
@@ -445,7 +472,6 @@ button, input {
                                             <span>${currencyUnits.data[key].option}</span>
                                         </label>
                                     </div>`
-                                
                             }
                         }
                        

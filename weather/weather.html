@@ -136,43 +136,57 @@
         return ""
     }
 
-    // get ad param from android
-    const isAndroid = typeof window.Android !== 'undefined'
-    let hotelId = ''
-    let zoneId = ''
-    let star = ''
-    let country = ''
-    let campaignId = ''
-    let lang = ''
+     // get ad param from android
+     var isAndroid = typeof window.Android !== 'undefined'
+    var adParamsDict = []
 
+    
     if (isAndroid && window.Android.getAdKeyValue) {
-        adKeyValue = JSON.parse(window.Android.getAdKeyValue())
-        hotelId = adKeyValue.hotel_id
-        zoneId = adKeyValue.zone_id
-        star = adKeyValue.star
-        country = adKeyValue.country
-        campaignId = adKeyValue.campaign_id
-        lang = adKeyValue.lang
-    }
-
-    console.log('========= hotelId, campaignId, lang, star, country, zoneId', hotelId, campaignId, lang, star, country, zoneId)
-
-    const AD_HOST = window.location.host
-    let adPath
-    if (AD_HOST === 'ads.hi.com') {
-        adPath = 'Tinklabs'
+      adKeyValue = JSON.parse(window.Android.getAdKeyValue())
     } else {
-        adPath = 'Test'
+      // this default params var browser can see ad
+      adKeyValue = {
+        hotel_id: 5707,
+        campaign_id: 0,
+        lang:'en_GB',
+        star:0,
+        country:100,
+        zone_id:3
+      }
     }
+
+   var adKeyArr = Object.keys(adKeyValue)
+    adKeyArr.forEach((key, index) => {
+      adParamsDict[index] = {}
+      adParamsDict[index].key = adKeyArr[index]
+      adParamsDict[index].value = adKeyValue[adKeyArr[index]]
+    })
+
+
+    console.log(adParamsDict,66666)
+    
+    var AD_HOST = window.location.host
+    let adPath
+
+    if (AD_HOST === 'b2c-ads.hi.com') {
+      adPath = 'Tinklabs'
+    } else if (AD_HOST === 'ads-uat.handytravel.tech') {
+      adPath = 'UAT'
+    } else {
+      adPath = 'Test'
+    }
+
     googletag.cmd.push(function() {
             googletag.defineSlot('/21623654641/Tinklabs/WW-01', [[360, 60]], 'div-gpt-ad-1539583823874-0')
                 .addService(googletag.pubads())
                 .setCollapseEmptyDiv(true,true);
             googletag.pubads().enableSingleRequest();
-            var c = "86";
-            var z = "111";
-            var h = "7001";
-            googletag.pubads().setTargeting('country', c).setTargeting('hotel_id', h).setTargeting('zone_id', z);
+
+            // dynamic set google ad params
+            adParamsDict.forEach(item => {
+                googletag.pubads().setTargeting(item.key, [item.value])
+            })
+            
             //googletag.pubads().collapseEmptyDivs();
             googletag.enableServices();
         });
