@@ -142,7 +142,7 @@
         var currentId = e.slot.getSlotElementId()
         var currentIndex = currentId.slice(currentId.length - 1)
         var currentAdFrameDoc = document.querySelector(`#${currentId}`).querySelector('iframe').contentWindow.document
-        var img = currentAdFrameDoc.querySelector('.i-amphtml-layout-fixed')
+        var img = currentAdFrameDoc.querySelector('amp-img')
         if (!img) {
           img = currentAdFrameDoc.querySelector('img')
         }
