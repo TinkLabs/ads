@@ -118,7 +118,9 @@
             item.querySelector('div').style.height = '196px'
           })
 
-          if (swiperSlideAfter.length) {
+          const slideNumb = swiperSlideAfter.length
+
+          if (slideNumb) {
             var swiper = new Swiper('.swiper-container', {
               spaceBetween: 30,
               centeredSlides: true,
@@ -130,7 +132,12 @@
                 el: '.swiper-pagination',
                 clickable: true,
               },
-            });
+            })
+            // remove pagination
+            if (slideNumb === 1) {
+              const pagination = document.querySelector('.swiper-pagination')
+              pagination.style.display = 'none'
+            }
           }
 
           // send data to top window
