@@ -45,8 +45,10 @@
     } else {
       // this default params var browser can see ad
       adKeyValue = {
-        hotel_id: 3747,
+        zone_id: 6,
+        lang: 'en_GB',
         campaign_id: 20190218,
+        time: JSON.stringify(new Date().getTime())
       }
     }
 
@@ -150,11 +152,13 @@
         var currentIndex = currentId.slice(currentId.length - 1)
         var currentAdFrameDoc = document.querySelector(`#${currentId}`).querySelector('iframe').contentWindow.document
         var img = currentAdFrameDoc.querySelector('amp-img')
+        let aLink = currentAdFrameDoc.querySelector('a')
         if (!img) {
           img = currentAdFrameDoc.querySelector('img')
         }
         img.style.width = '336px'
         img.style.height = '196px'
+        aLink.style[`-webkit-tap-highlight-color`] = 'rgba(255,255,255,0)'
 
          // send data to top window for ad impression
          window.top.postMessage( {
