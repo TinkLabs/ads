@@ -21,18 +21,26 @@
     // get ad param from android
     var isAndroid = typeof window.Android !== 'undefined'
     var adParamsDict = []
+    var adKeyValue = {}
 
     if (isAndroid && window.Android.getAdKeyValue) {
-      var adKeyValue = JSON.parse(window.Android.getAdKeyValue())
-      console.log('getAdKeyValue', window.Android.getAdKeyValue())
-
-      var adKeyArr = Object.keys(adKeyValue)
-      adKeyArr.forEach((key, index) => {
-        adParamsDict[index] = {}
-        adParamsDict[index].key = adKeyArr[index]
-        adParamsDict[index].value = adKeyValue[adKeyArr[index]]
-      })
+      adKeyValue = JSON.parse(window.Android.getAdKeyValue())
+    } else {
+      // this default params var browser can see ad
+      adKeyValue = {
+        zone_id: 6,
+        lang: 'en_GB',
+        campaign_id: 20190218,
+        time: JSON.stringify(new Date().getTime())
+      }
     }
+
+    var adKeyArr = Object.keys(adKeyValue)
+    adKeyArr.forEach((key, index) => {
+      adParamsDict[index] = {}
+      adParamsDict[index].key = adKeyArr[index]
+      adParamsDict[index].value = adKeyValue[adKeyArr[index]]
+    })
 
     var AD_HOST = window.location.host
     var adPath
@@ -66,65 +74,68 @@
     });
   </script>
 
+  <!-- carousel logic -->
   <script>
-    window.onload = () => {
-      var iframe = Array.prototype.slice.call(document.getElementsByTagName("iframe")).splice(0, 5);
-      // console.log(iframe)
-      var swiperWrapper = document.querySelector('.swiper-wrapper');
-      var swiperContainer = document.querySelector('.swiper-container');
-      var loader = document.querySelector('.loader');
-      // console.log(iframe.length, 23333)
-      var swiperSlideBefore = Array.prototype.slice.call(document.querySelectorAll('.swiper-slide'));
+    googletag.cmd.push(function () {
+      // judge if first ad load completely
+      var isFirstLoad = false
+      var swiperWrapper = document.querySelector('.swiper-wrapper')
 
-      var allHasIframe = swiperSlideBefore.every(item => !!item.querySelector('iframe'))
+      // slot has rendered but ad not loaded completely
+      googletag.pubads().addEventListener('slotRenderEnded', (e) => {
+        // console.log('carousel slotRenderEnded')
+        if (!swiperWrapper) {
+          swiperWrapper = document.querySelector('.swiper-wrapper');
+        }
+        var currentId = e.slot.getSlotElementId()
+        // remove emplty ad
+        if (e.isEmpty) {
+          swiperWrapper.removeChild(document.querySelector(`#${currentId}`).parentNode)
+        }
+      });
 
-      setTimeout(() => {
-        // if ad is empty, there two condition: return iframe width empty body and no return iframe 
-        if (allHasIframe) {
-          iframe.forEach(item => {
-            // google ad exchange embed iframe with crossdomain src
-            if (!item.src) {
-              if (!item.contentWindow.document.body.childNodes.length) {
-                swiperWrapper.removeChild(item.parentNode.parentNode.parentNode)
-              }
-            }
-          });
-        } else {
-          swiperSlideBefore.forEach(item => {
-            if (!item.querySelector('iframe')) {
-              swiperWrapper.removeChild(item)
-            }
+      // ad has loaded completely
+      googletag.pubads().addEventListener('slotOnload', (e) => {
+        // console.log('carousel slotOnload')
+        // init swiper, just init once
+        if (!isFirstLoad) {
+          var swiperSlideAfter = [...document.querySelectorAll('.swiper-slide')];
+          swiperSlideAfter.forEach(item => {
+            item.querySelector('div').style.height = '210px'
           })
-        }
 
-        var swiperSlideAfter = document.querySelector('.swiper-slide');
-        // console.log(swiperSlideAfter, 1111)
-        if (swiperSlideAfter) {
-          var swiper = new Swiper('.swiper-container', {
-            spaceBetween: 30,
-            centeredSlides: true,
-            autoplay: {
-              delay: 3000,
-              disableOnInteraction: false,
-            },
-            pagination: {
-              el: '.swiper-pagination',
-              clickable: true,
-            },
-          });
-          loader.style.display = 'none'
-          if (document.querySelectorAll('.swiper-slide').length === 1) {
-            document.querySelector('.swiper-pagination').style.display = 'none'
+          const slideNumb = swiperSlideAfter.length
+
+          if (slideNumb) {
+            var swiper = new Swiper('.swiper-container', {
+              spaceBetween: 30,
+              centeredSlides: true,
+              autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+              },
+              pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+              },
+            })
+            // remove pagination
+            if (slideNumb === 1) {
+              const pagination = document.querySelector('.swiper-pagination')
+              pagination.style.display = 'none'
+            }
           }
-        } else {
-          swiperContainer.style.display = 'none'
         }
-        // Initialize Swiper
-      }, 500)
-    }
-  </script>
+        isFirstLoad = true
 
-  <!-- Demo styles -->
+        // remove click background
+        var currentId = e.slot.getSlotElementId()
+        var currentAdFrameDoc = document.querySelector(`#${currentId}`).querySelector('iframe').contentWindow.document
+        let aLink = currentAdFrameDoc.querySelector('a')
+        aLink.style[`-webkit-tap-highlight-color`] = 'rgba(255,255,255,0)'
+      });
+    })
+  </script>
   <style>
     html, body {
       position: relative;
@@ -145,7 +156,7 @@
     .swiper-container {
       position: relative;
       width: 360px;
-      height: 210px;
+      /* height: 210px; */
       overflow: hidden;
     }
     .swiper-container-horizontal>.swiper-pagination-bullets .swiper-pagination-bullet {
@@ -174,6 +185,10 @@
       -webkit-align-items: center;
       align-items: center;
     }
+    .swiper-slide div {
+      width: 360px !important;
+      height: 0px;
+    }
     .swiper-pagination-bullet-active {
       background-color: #fff !important;
       opacity: 0.75 !important;
@@ -188,68 +203,11 @@
     .swiper-container-horizontal>.swiper-pagination-bullets .swiper-pagination-bullet {
       margin: 0;
     }
-    .loader {
-      position: absolute;
-      top: 0;
-      left: 0;
-      padding-top: 60px;
-      width: 360px;
-      height: 210px;
-      background-color: #f0f5f8;
-      z-index: 9999;
-    }
-    #loader-2 { 
-      text-align: center;
-    }
-    #loader-2 span{
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 100%;
-      margin: 36px 4px;
-    }
-
-    #loader-2 span:nth-child(1){
-      animation: bounce 1s ease-in-out infinite;
-      background-color: rgb(171, 197, 227);
-    }
-
-    #loader-2 span:nth-child(2){
-      animation: bounce 1s ease-in-out 0.33s infinite;
-      background-color: rgb(114, 153, 210);
-
-    }
-
-    #loader-2 span:nth-child(3){
-      animation: bounce 1s ease-in-out 0.66s infinite;
-      background-color: rgb(43, 91, 140);
-    }
-
-    @keyframes bounce{
-      0%, 75%, 100%{
-        -webkit-transform: translateY(0);
-        -ms-transform: translateY(0);
-        -o-transform: translateY(0);
-        transform: translateY(0);
-      }
-
-      25%{
-        -webkit-transform: translateY(-10px);
-        -ms-transform: translateY(-10px);
-        -o-transform: translateY(-10px);
-        transform: translateY(-10px);
-      }
-    }
   </style>
 </head>
 <body>
   <!-- Swiper -->
   <div class="swiper-container">
-    <div class="loader" id="loader-2">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
     <div class="swiper-wrapper">
       <div class="swiper-slide">
         <div id='div-gpt-ad-1547119989301-0'>
@@ -299,28 +257,9 @@
     </div>
     <!-- Add Pagination -->
     <div class="swiper-pagination"></div>
-    <!-- Add Arrows -->
-    <!-- <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div> -->
   </div>
 
   <!-- Swiper JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.4.6/js/swiper.min.js"></script>
-
-  <!-- Initialize Swiper -->
-  <script>
-    // var swiper = new Swiper('.swiper-container', {
-    //   spaceBetween: 30,
-    //   centeredSlides: true,
-    //   autoplay: {
-    //     delay: 2500,
-    //     disableOnInteraction: false,
-    //   },
-    //   pagination: {
-    //     el: '.swiper-pagination',
-    //     clickable: true,
-    //   },
-    // });
-  </script>
 </body>
 </html>
