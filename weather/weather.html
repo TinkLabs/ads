@@ -141,7 +141,7 @@
     var adParamsDict = []
 
     
-    if (isAndroid && window.Android.getAdKeyValue) {
+    if (isAndroid && window.Android.getAdKeyValue()) {
       adKeyValue = JSON.parse(window.Android.getAdKeyValue())
     } else {
       // this default params var browser can see ad
