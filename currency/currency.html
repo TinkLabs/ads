@@ -345,7 +345,7 @@ button, input {
             document.getElementById('toSelectModal').style.display ='none'
             changeObj.src=`https://cdn.handy.travel/ads/images/flags/${nationName}.png`
             changeObj.parentNode.children[1].innerHTML = nationName;
-            changeObj.parentNode.children[2].setAttribute("curr-rate", curencyRate.toFixed(3));
+            changeObj.parentNode.children[2].setAttribute("curr-rate", curencyRate);
             
             //set target-rate
             var currencyToObj = document.getElementById('currency-to-amount')
@@ -354,8 +354,9 @@ button, input {
             var fromRate = parseFloat(currencyToObj.getAttribute("curr-rate")) / parseFloat(currencyFromObj.getAttribute("curr-rate"))
             var toRate  = parseFloat(currencyFromObj.getAttribute("curr-rate")) / parseFloat(currencyToObj.getAttribute("curr-rate"))
 
-            currencyFromObj.setAttribute("target-rate", fromRate.toFixed(3));
-            currencyToObj.setAttribute("target-rate", toRate.toFixed(3));
+            
+            currencyFromObj.setAttribute("target-rate", fromRate);
+            currencyToObj.setAttribute("target-rate", toRate);
 
            //reset changeObj's value
            var changeTargetObj = document.querySelector('.change-target')
