@@ -14,33 +14,20 @@
   </script>
 
   <script>
-    const getCookie = name => {
-      //获取name在Cookie中起止位置
-      let start = document.cookie.indexOf(name + "=")
-
-      if (start !== -1) {
-        start = start + name.length + 1
-        //获取value的终止位置
-        let end = document.cookie.indexOf(";", start)
-        if (end === -1)
-          end = document.cookie.length
-        //截获cookie的value值,并返回
-        return unescape(document.cookie.substring(start, end))
-      }
-      return ""
-    }
-
      // get ad param from android
      var isAndroid = typeof window.Android !== 'undefined'
     var adParamsDict = []
+    var adKeyValue = {}
 
     if (isAndroid && window.Android.getAdKeyValue()) {
       adKeyValue = JSON.parse(window.Android.getAdKeyValue())
     } else {
       // this default params var browser can see ad
       adKeyValue = {
-        hotel_id: 3747,
+        zone_id: 6,
+        lang: 'en_GB',
         campaign_id: 20190218,
+        time: JSON.stringify(new Date().getTime())
       }
     }
 
@@ -75,6 +62,43 @@
             googletag.enableServices();
         });
     
+  </script>
+
+  <!-- monitor the ad load and control the display -->
+  <script>
+        googletag.cmd.push(function () {
+        
+            var adContainer = document.querySelector('.ad-container')
+
+            // slot has rendered but ad not loaded completely
+            googletag.pubads().addEventListener('slotRenderEnded', (e) => {
+                // console.log('carousel slotRenderEnded')
+                if (!adContainer) {
+                    adContainer = document.querySelector('.ad-container');
+                }
+                var currentId = e.slot.getSlotElementId()
+                console.log(currentId)
+                // remove emplty ad
+                if (e.isEmpty) {
+                    adContainer.removeChild(document.querySelector(`#${currentId}`))
+                }
+            });
+
+            // ad has loaded completely
+            googletag.pubads().addEventListener('slotOnload', (e) => {
+                // console.log('carousel slotOnload')
+                // init swiper, just init once
+                if (!adContainer) {
+                    adContainer.querySelector('div').style.height = '35px'
+                    document.querySelector('.adcontent').style.overflow = 'hidden'
+                }
+                // remove click background
+                var currentId = e.slot.getSlotElementId()
+                var currentAdFrameDoc = document.querySelector(`#${currentId}`).querySelector('iframe').contentWindow.document
+                let aLink = currentAdFrameDoc.querySelector('a')
+                aLink.style[`-webkit-tap-highlight-color`] = 'rgba(255,255,255,0)'
+            });
+        })
   </script>
   <!-- Demo styles -->
 <style>
@@ -113,8 +137,12 @@ button, input {
 }
 .currency{
     width: 360px;
-    height: 235px;
+    /* height: 235px; */
     /*border: 0.5px solid gray;*/
+}
+.currency .ad{
+    overflow: hidden;
+    zoom: 1;
 }
 .currency .converter{
     height: 173.5px;
@@ -148,9 +176,6 @@ button, input {
     width: 32.5px;
     height: 32.5px;
     background: url("./convert.jpg");
-}
-.currency .ad{
-    height: 61.5px;
 }
 .currency .update-time{
     padding-left: 6.8px;
@@ -187,6 +212,7 @@ button, input {
 }
 .fade.show {
     opacity: 1;
+    height: 700px;
 }
 .modal {
     position: fixed;
@@ -196,7 +222,6 @@ button, input {
     left: 0;
     z-index: 1050;
     display: none;
-    overflow: hidden;
     background: rgba(179, 175, 175);
     outline: 0;
 }
@@ -312,7 +337,7 @@ button, input {
       <div style="width:50%;float: right;">
         <div class="adcontent">
           <div>Sponsored by</div>
-          <div style="height:35px; max-width:100px;float: right;">
+          <div class="ad-container" style="float: right;">
               <div id="div-gpt-ad-1540870387934-0" style="height:35px; width:100px;" data-google-query-id="CO6Y3oeZ_OACFdExYAod7poF1Q">
                   <script>
                       googletag.cmd.push(function() { googletag.display('div-gpt-ad-1540870387934-0'); });
