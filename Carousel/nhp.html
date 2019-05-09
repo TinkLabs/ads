@@ -13,151 +13,213 @@
   <script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
 
   <script>
-    window.top.postMessage( {test: 11111}, '*');
     var googletag = googletag || {};
     googletag.cmd = googletag.cmd || [];
   </script>
 
   <script>
+    // change variable by ad host
+    var AD_HOST = window.location.host
+    var adPath
+    var CMSHost
+    if (AD_HOST === 'b2c-ads.hi.com') {
+      adPath = 'Tinklabs'
+      CMSHost = 'https://hk.handy.travel'
+    } else if (AD_HOST === 'ads-uat.handytravel.tech') {
+      adPath = 'UAT'
+      CMSHost = 'https://uat.handy.travel'
+    } else {
+      adPath = 'Test'
+      CMSHost = 'https://staging.handy.travel'
+    }
+
     // get ad param from android
     var isAndroid = typeof window.Android !== 'undefined'
     var adParamsDict = []
     var adKeyValue = {}
+    var barcode = '355655090012297'
+    if (isAndroid && window.Android.getDeviceInfo()) {
+      deviceObj = JSON.parse(window.Android.getDeviceInfo())
+      barcode = deviceObj.imei
+    }
 
-    if (isAndroid && window.Android.getAdKeyValue()) {
-      adKeyValue = JSON.parse(window.Android.getAdKeyValue())
-    } else {
-      // this default params var browser can see ad
-      adKeyValue = {
-        zone_id: 6,
-        lang: 'en_GB',
-        campaign_id: 20190218,
-        time: JSON.stringify(new Date().getTime())
+    // native ajax request, just be compatible with chrome
+    var newAjax = function (method, url, fnSucc, fnFail) {
+      xhr = new XMLHttpRequest()
+      // 连接服务器
+      xhr.open(method, url);
+      // 发送请求,send里面如果是空参数时要不要穿null？
+      xhr.send();
+      // 接收响应
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+            // 这就是经常用的.then(data)或者.then(response)，参数其实就是返回的参数
+            // 这里把返回的参数作为请求成功的回调函数的参数
+            fnSucc(xhr.responseText);
+          } else {
+            // 或者与后台沟通定义的错误信息
+            fnFail('请求失败' + xhr.status);
+          }
+        }
       }
     }
+    var sendGoogleAd = function() {
+      // default value
+      // adKeyValue = {
+      //   zone_id: 6,
+      //   lang: 'en_GB',
+      //   campaign_id: 20190218,
+      // }
 
-    var adKeyArr = Object.keys(adKeyValue)
-    adKeyArr.forEach((key, index) => {
-      adParamsDict[index] = {}
-      adParamsDict[index].key = adKeyArr[index]
-      adParamsDict[index].value = adKeyValue[adKeyArr[index]]
-    })
+      var adKeyArr = Object.keys(adKeyValue)
+      adKeyArr.forEach((key, index) => {
+        adParamsDict[index] = {}
+        adParamsDict[index].key = adKeyArr[index]
+        adParamsDict[index].value = adKeyValue[adKeyArr[index]]
+      })
 
-    var AD_HOST = window.location.host
-    var adPath
-    if (AD_HOST === 'b2c-ads.hi.com') {
-      adPath = 'Tinklabs'
-    } else if (AD_HOST === 'ads-uat.handytravel.tech') {
-      adPath = 'UAT'
-    } else {
-      adPath = 'Test'
+      googletag.cmd.push(function () {
+        googletag.defineSlot(`/21623654641/${adPath}/NHP-C-01`, [360, 210], 'div-gpt-ad-1547119989301-0').addService(
+          googletag.pubads());
+        googletag.defineSlot(`/21623654641/${adPath}/NHP-C-02`, [360, 210], 'div-gpt-ad-1547119989301-1').addService(
+          googletag.pubads());
+        googletag.defineSlot(`/21623654641/${adPath}/NHP-C-03`, [360, 210], 'div-gpt-ad-1547119989301-2').addService(
+          googletag.pubads());
+        googletag.defineSlot(`/21623654641/${adPath}/NHP-C-04`, [360, 210], 'div-gpt-ad-1547119989301-3').addService(
+          googletag.pubads());
+        googletag.defineSlot(`/21623654641/${adPath}/NHP-C-05`, [360, 210], 'div-gpt-ad-1547119989301-4').addService(
+          googletag.pubads());
+        googletag.pubads().enableSingleRequest();
+        googletag.enableServices();
+        googletag.pubads().collapseEmptyDivs();
+        // dynamic set google ad params
+        adParamsDict.forEach(item => {
+          googletag.pubads().setTargeting(item.key, [item.value])
+        })
+      });
     }
 
-    googletag.cmd.push(function () {
-      googletag.defineSlot(`/21623654641/${adPath}/NHP-C-01`, [360, 210], 'div-gpt-ad-1547119989301-0').addService(
-        googletag.pubads());
-      googletag.defineSlot(`/21623654641/${adPath}/NHP-C-02`, [360, 210], 'div-gpt-ad-1547119989301-1').addService(
-        googletag.pubads());
-      googletag.defineSlot(`/21623654641/${adPath}/NHP-C-03`, [360, 210], 'div-gpt-ad-1547119989301-2').addService(
-        googletag.pubads());
-      googletag.defineSlot(`/21623654641/${adPath}/NHP-C-04`, [360, 210], 'div-gpt-ad-1547119989301-3').addService(
-        googletag.pubads());
-      googletag.defineSlot(`/21623654641/${adPath}/NHP-C-05`, [360, 210], 'div-gpt-ad-1547119989301-4').addService(
-        googletag.pubads());
-      googletag.pubads().enableSingleRequest();
-      googletag.enableServices();
-      googletag.pubads().collapseEmptyDivs();
-      // dynamic set google ad params
-      adParamsDict.forEach(item => {
-        googletag.pubads().setTargeting(item.key, [item.value])
+    // dynamic add google script in html
+    var addGoogleADScript = function() {
+      ['0', '1' ,'2', '3', '4'].forEach(function(item) {
+        var id = 'div-gpt-ad-1547119989301-' + item
+        var container = document.querySelector('#' + id)
+        var script = document.createElement('script')
+        script.innerHTML = 'googletag.cmd.push(function () {' +
+            'googletag.display("' + id + '");' +
+          '});'
+          // container.
+        container.appendChild(script);
       })
-    });
-  </script>
+    }
 
-  <!-- carousel logic -->
-  <script>
-    googletag.cmd.push(function () {
-      // judge if first ad load completely
-      var isFirstLoad = false
-      var swiperWrapper = document.querySelector('.swiper-wrapper')
+    var addCarousel = function() {
+      googletag.cmd.push(function () {
+        // judge if first ad load completely
+        var isFirstLoad = false
+        var swiperWrapper = document.querySelector('.swiper-wrapper');
 
-      // slot has rendered but ad not loaded completely
-      googletag.pubads().addEventListener('slotRenderEnded', (e) => {
-        // console.log('carousel slotRenderEnded')
-        if (!swiperWrapper) {
-          swiperWrapper = document.querySelector('.swiper-wrapper');
-        }
-        var currentId = e.slot.getSlotElementId()
-        // remove emplty ad
-        if (e.isEmpty) {
-          swiperWrapper.removeChild(document.querySelector(`#${currentId}`).parentNode)
-        }
-      });
-
-      // ad has loaded completely
-      googletag.pubads().addEventListener('slotOnload', (e) => {
-        // console.log('carousel slotOnload')
-        // init swiper, just init once
-        if (!isFirstLoad) {
-          var swiperSlideAfter = [...document.querySelectorAll('.swiper-slide')];
-          swiperSlideAfter.forEach(item => {
-            item.querySelector('div').style.height = '196px'
-          })
-
-          const slideNumb = swiperSlideAfter.length
-
-          if (slideNumb) {
-            var swiper = new Swiper('.swiper-container', {
-              spaceBetween: 30,
-              centeredSlides: true,
-              autoplay: {
-                delay: 3000,
-                disableOnInteraction: false,
-              },
-              pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-              },
-            })
-            // remove pagination
-            if (slideNumb === 1) {
-              const pagination = document.querySelector('.swiper-pagination')
-              pagination.style.display = 'none'
-            }
+        // slot has rendered but ad not loaded completely
+        googletag.pubads().addEventListener('slotRenderEnded', (e) => {
+          // console.log('carousel slotRenderEnded')
+          if (!swiperWrapper) {
+            swiperWrapper = document.querySelector('.swiper-wrapper');
           }
+          var currentId = e.slot.getSlotElementId()
+          // remove emplty ad
+          if (e.isEmpty) {
+            swiperWrapper.removeChild(document.querySelector(`#${currentId}`).parentNode)
+          }
+        });
 
-          // send data to top window
-          window.top.postMessage( {isCarouselFirstLoad: true}, '*');
-        }
-        isFirstLoad = true
+        // ad has loaded completely
+        googletag.pubads().addEventListener('slotOnload', (e) => {
+          // console.log('carousel slotOnload')
+          // init swiper, just init once
+          if (!isFirstLoad) {
+            var swiperSlideAfter = [...document.querySelectorAll('.swiper-slide')];
+            swiperSlideAfter.forEach(item => {
+              item.querySelector('div').style.height = '196px'
+            })
 
-        // change img size
-        var currentId = e.slot.getSlotElementId()
-        var currentIndex = currentId.slice(currentId.length - 1)
-        var currentAdFrameDoc = document.querySelector(`#${currentId}`).querySelector('iframe').contentWindow.document
-        var img = currentAdFrameDoc.querySelector('amp-img')
-        let aLink = currentAdFrameDoc.querySelector('a')
-        if (!img) {
-          img = currentAdFrameDoc.querySelector('img')
-        }
-        img.style.width = '336px'
-        img.style.height = '196px'
-        aLink.style[`-webkit-tap-highlight-color`] = 'rgba(255,255,255,0)'
+            var slideNumb = swiperSlideAfter.length
 
-         // send data to top window for ad impression
-         window.top.postMessage( {
-            isCarouselLoad: true,
-            index: currentIndex,
-          }, '*');
-        // send data to top window for ad click mixpanel
-        currentAdFrameDoc.getElementsByTagName("html")[0].addEventListener('click', () => {
+            if (slideNumb) {
+              var swiper = new Swiper('.swiper-container', {
+                spaceBetween: 30,
+                centeredSlides: true,
+                autoplay: {
+                  delay: 3000,
+                  disableOnInteraction: false,
+                },
+                pagination: {
+                  el: '.swiper-pagination',
+                  clickable: true,
+                },
+              })
+              // remove pagination
+              if (slideNumb === 1) {
+                var pagination = document.querySelector('.swiper-pagination')
+                pagination.style.display = 'none'
+              }
+            }
+
+            // send data to top window
+            window.top.postMessage( {isCarouselFirstLoad: true}, '*');
+          }
+          isFirstLoad = true
+
+          // change img size
+          var currentId = e.slot.getSlotElementId()
+          var currentIndex = currentId.slice(currentId.length - 1)
+          var currentAdFrameDoc = document.querySelector(`#${currentId}`).querySelector('iframe').contentWindow.document
+          var img = currentAdFrameDoc.querySelector('amp-img')
+          var aLink = currentAdFrameDoc.querySelector('a')
+          if (!img) {
+            img = currentAdFrameDoc.querySelector('img')
+          }
+          img.style.width = '336px'
+          img.style.height = '196px'
+          aLink.style[`-webkit-tap-highlight-color`] = 'rgba(255,255,255,0)'
+
+          // send data to top window for ad impression
           window.top.postMessage( {
-            isCarouselClick: true,
-            index: currentIndex,
-          }, '*');
-        }, true)
-      });
-    })
+              isCarouselLoad: true,
+              index: currentIndex,
+            }, '*');
+          // send data to top window for ad click mixpanel
+          currentAdFrameDoc.getElementsByTagName("html")[0].addEventListener('click', () => {
+            window.top.postMessage( {
+              isCarouselClick: true,
+              index: currentIndex,
+            }, '*');
+          }, true)
+        });
+      })
+    }
+
+    ;(function () {
+      // get key-value from backend
+      newAjax('GET', CMSHost + '/apis/key_value?_barcode=' + barcode,
+      // success
+      function(data) {
+        adKeyValue = JSON.parse(data).key_value
+        if (!adKeyValue.campaign_id) {
+          adKeyValue.campaign_id = '0'
+        }
+        // send google ad
+        sendGoogleAd()
+        // add google ad script
+        addGoogleADScript()
+        // add corousel
+        addCarousel()
+      },
+      // fail
+      function (e) {
+        console.log(e)
+      })
+    })()
   </script>
   
   <style>
@@ -249,47 +311,22 @@
     <div class="swiper-wrapper">
       <div class="swiper-slide">
         <div id='div-gpt-ad-1547119989301-0'>
-          <script>
-            googletag.cmd.push(function () {
-              googletag.display('div-gpt-ad-1547119989301-0');
-            });
-          </script>
         </div>
       </div>
       <div class="swiper-slide">
         <div id='div-gpt-ad-1547119989301-1'>
-          <script>
-            googletag.cmd.push(function () {
-              googletag.display('div-gpt-ad-1547119989301-1');
-            });
-          </script>
         </div>
       </div>
       <div class="swiper-slide">
         <div id='div-gpt-ad-1547119989301-2'>
-          <script>
-            googletag.cmd.push(function () {
-              googletag.display('div-gpt-ad-1547119989301-2');
-            });
-          </script>
         </div>
       </div>
       <div class="swiper-slide">
         <div id='div-gpt-ad-1547119989301-3'>
-          <script>
-            googletag.cmd.push(function () {
-              googletag.display('div-gpt-ad-1547119989301-3');
-            });
-          </script>
         </div>
       </div>
       <div class="swiper-slide">
         <div id='div-gpt-ad-1547119989301-4'>
-          <script>
-            googletag.cmd.push(function () {
-              googletag.display('div-gpt-ad-1547119989301-4');
-            });
-          </script>
         </div>
       </div>
     </div>

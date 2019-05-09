@@ -14,67 +14,111 @@
   </script>
 
   <script>
-    const getCookie = name => {
-      //获取name在Cookie中起止位置
-      let start = document.cookie.indexOf(name + "=")
-
-      if (start !== -1) {
-        start = start + name.length + 1
-        //获取value的终止位置
-        let end = document.cookie.indexOf(";", start)
-        if (end === -1)
-          end = document.cookie.length
-        //截获cookie的value值,并返回
-        return unescape(document.cookie.substring(start, end))
-      }
-      return ""
-    }
-
-     // get ad param from android
-     var isAndroid = typeof window.Android !== 'undefined'
-    var adParamsDict = []
-
-    if (isAndroid && window.Android.getAdKeyValue()) {
-      adKeyValue = JSON.parse(window.Android.getAdKeyValue())
-    } else {
-      // this default params var browser can see ad
-      adKeyValue = {
-        hotel_id: 3747,
-        campaign_id: 20190218,
-      }
-    }
-
-    var adKeyArr = Object.keys(adKeyValue)
-    adKeyArr.forEach((key, index) => {
-      adParamsDict[index] = {}
-      adParamsDict[index].key = adKeyArr[index]
-      adParamsDict[index].value = adKeyValue[adKeyArr[index]]
-    })
-    
+    // change variable by ad host
     var AD_HOST = window.location.host
-    let adPath
-
+    var adPath
+    var CMSHost
     if (AD_HOST === 'b2c-ads.hi.com') {
       adPath = 'Tinklabs'
+      CMSHost = 'https://hk.handy.travel'
     } else if (AD_HOST === 'ads-uat.handytravel.tech') {
       adPath = 'UAT'
+      CMSHost = 'https://uat.handy.travel'
     } else {
       adPath = 'Test'
+      CMSHost = 'https://staging.handy.travel'
     }
 
-    
-    googletag.cmd.push(function() {
-            googletag.defineSlot('/21623654641/Tinklabs/CW-01', [[100,35],[70,35],[35,35]], 'div-gpt-ad-1540870387934-0').addService(googletag.pubads());
-            googletag.pubads().enableSingleRequest();
+    // get ad param from android
+    var isAndroid = typeof window.Android !== 'undefined'
+    var adParamsDict = []
+    var adKeyValue = {}
+    var barcode = '355655090012297'
+    if (isAndroid && window.Android.getDeviceInfo()) {
+      deviceObj = JSON.parse(window.Android.getDeviceInfo())
+      barcode = deviceObj.imei
+    }
 
-            // dynamic set google ad params
-            adParamsDict.forEach(item => {
-                googletag.pubads().setTargeting(item.key, [item.value])
-            })
+    // native ajax request, just be compatible with chrome
+    var newAjax = function (method, url, fnSucc, fnFail) {
+      xhr = new XMLHttpRequest()
+      // 连接服务器
+      xhr.open(method, url);
+      // 发送请求,send里面如果是空参数时要不要穿null？
+      xhr.send();
+      // 接收响应
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+            // 这就是经常用的.then(data)或者.then(response)，参数其实就是返回的参数
+            // 这里把返回的参数作为请求成功的回调函数的参数
+            fnSucc(xhr.responseText);
+          } else {
+            // 或者与后台沟通定义的错误信息
+            fnFail('请求失败' + xhr.status);
+          }
+        }
+      }
+    }
+    var sendGoogleAd = function() {
+      // default value
+      // adKeyValue = {
+      //   zone_id: 6,
+      //   lang: 'en_GB',
+      //   campaign_id: 20190218,
+      // }
 
-            googletag.enableServices();
-        });
-    
+      var adKeyArr = Object.keys(adKeyValue)
+      adKeyArr.forEach((key, index) => {
+        adParamsDict[index] = {}
+        adParamsDict[index].key = adKeyArr[index]
+        adParamsDict[index].value = adKeyValue[adKeyArr[index]]
+      })
+      
+      googletag.cmd.push(function() {
+        googletag.defineSlot('/21623654641/Tinklabs/CW-01', [[100,35],[70,35],[35,35]], 'div-gpt-ad-1540870387934-0').addService(googletag.pubads());
+        googletag.pubads().enableSingleRequest();
+
+        // dynamic set google ad params
+        adParamsDict.forEach(item => {
+            googletag.pubads().setTargeting(item.key, [item.value])
+        })
+
+        googletag.enableServices();
+      });
+    }
+
+    // dynamic add google script in html
+    var addGoogleADScript = function() {
+      var id = 'div-gpt-ad-1540870387934-0'
+      var container = document.querySelector('#div-gpt-ad-1540870387934-0')
+      var script = document.createElement('script')
+      script.innerHTML = 'googletag.cmd.push(function () {' +
+          'googletag.display("div-gpt-ad-1540870387934-0");' +
+        '});'
+        // container.
+      container.appendChild(script)
+    }
+    // init function
+    ;(function() {
+      // get key-value from backend
+      newAjax('GET', CMSHost + '/apis/key_value?_barcode=' + barcode,
+      // success
+      function(data) {
+        adKeyValue = JSON.parse(data).key_value
+        if (!adKeyValue.campaign_id) {
+          adKeyValue.campaign_id = '0'
+        }
+        // send google ad
+        sendGoogleAd()
+        // add google ad script
+        addGoogleADScript()
+      },
+      // fail
+      function (e) {
+        console.log(e)
+      })
+    })()
   </script>
   <!-- Demo styles -->
 <style>
@@ -314,9 +358,6 @@ button, input {
           <div>Sponsored by</div>
           <div style="height:35px; max-width:100px;float: right;">
               <div id="div-gpt-ad-1540870387934-0" style="height:35px; width:100px;" data-google-query-id="CO6Y3oeZ_OACFdExYAod7poF1Q">
-                  <script>
-                      googletag.cmd.push(function() { googletag.display('div-gpt-ad-1540870387934-0'); });
-                  </script>
               <div id="google_ads_iframe_/21623654641/Tinklabs/CW-01_0__container__" style="border: 0pt none; width: 100px; height: 35px;"></div></div>
           </div>
         </div>
