@@ -38,9 +38,11 @@
     var adParamsDict = []
     var adKeyValue = {}
     var barcode = '355655090012297'
+    var campaignId = ''
     if (isAndroid && window.Android.getDeviceInfo()) {
       deviceObj = JSON.parse(window.Android.getDeviceInfo())
       barcode = deviceObj.imei
+      campaignId = window.Android.getCampaignId()
     }
 
     // native ajax request, just be compatible with chrome
@@ -182,6 +184,7 @@
       // success
       function(data) {
         adKeyValue = JSON.parse(data).key_value
+        adKeyValue.campaign_id = campaignId
         if (!adKeyValue.campaign_id) {
           adKeyValue.campaign_id = '0'
         }
