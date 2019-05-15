@@ -246,7 +246,7 @@
         <div class="weather-header">
             <div class="header-content weather-header-left">
                 <div class="cf-toggle">
-                    <span class="temperature-unit" onclick="unitChange(event)" >°C</span><span class="temperature-unit curr-unit" data-unit="°F" onclick="unitChange(event)">°F</span>
+                    <span class="temperature-unit curr-unit" onclick="unitChange(event)" >°C</span><span class="temperature-unit" data-unit="°F" onclick="unitChange(event)">°F</span>
                 </div>
             </div>
             <div class="header-content weather-header-right">
@@ -338,11 +338,47 @@
            
         </div>
   </div>
-  <div class="ad-box" style="margin-top:10px;">
+  <div class="ad-box ad-container" style="margin-top:10px;">
       <div id='div-gpt-ad-1539583823874-0' styl="width:360px;height:363pxoverflow-x: hidden;">
       </div>
   </div>
 </div>
+
+<script>
+        googletag.cmd.push(function () {
+        
+            var adContainer = document.querySelector('.ad-container')
+
+            // slot has rendered but ad not loaded completely
+            googletag.pubads().addEventListener('slotRenderEnded', (e) => {
+                
+                if (!adContainer) {
+                    adContainer = document.querySelector('.ad-container');
+                }
+                var currentId = e.slot.getSlotElementId()
+                
+                // remove emplty ad
+                if (e.isEmpty) {
+                    adContainer.removeChild(document.querySelector(`#${currentId}`))
+                }
+            });
+
+            // ad has loaded completely
+            googletag.pubads().addEventListener('slotOnload', (e) => {
+               
+                // init swiper, just init once
+                if (!adContainer) {
+                    adContainer.querySelector('div').style.height = '60px'
+                    document.querySelector('.adcontent').style.overflow = 'hidden'
+                }
+                // remove click background
+                var currentId = e.slot.getSlotElementId()
+                var currentAdFrameDoc = document.querySelector(`#${currentId}`).querySelector('iframe').contentWindow.document
+                let aLink = currentAdFrameDoc.querySelector('a')
+                aLink.style[`-webkit-tap-highlight-color`] = 'rgba(255,255,255,0)'
+            });
+        })
+  </script>
 
 <script>
     var value_elements = document.querySelectorAll('.temperature-value');
@@ -377,7 +413,7 @@
         const forcast_items = document.querySelectorAll('.forecast-item')
         const temperature_items = document.querySelectorAll('.temperature-item')
         
-        fetch('https://staging.handy.travel/apis/get_weather_info?_barcode=355655090012297')
+        fetch('https://staging.handy.travel/apis/get_weather_info?_barcode='+ barcode)
             .then(res => res.json())
             .catch(e => {
                 console.log('Error:', e)
