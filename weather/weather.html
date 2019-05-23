@@ -141,9 +141,9 @@
     var adKeyValue = {}
     var barcode = '355655090012297'
     var campaignId = ''
-    if (isAndroid && window.Android.getDeviceInfo()) {
-      deviceObj = JSON.parse(window.Android.getDeviceInfo())
-      barcode = deviceObj.imei
+    if (isAndroid && window.Android.getGlobalProperties) {
+      globalProperties = JSON.parse(window.Android.getGlobalProperties())
+      barcode = globalProperties.imei
       campaignId = window.Android.getCampaignId()
     }
 
