@@ -35,6 +35,9 @@
 
     if (isAndroid && window.Android.getAdKeyValue && window.Android.getAdKeyValue()) {
       adKeyValue = JSON.parse(window.Android.getAdKeyValue())
+      if (window.Android.getCampaignId) {
+        adKeyValue.campaign_id = window.Android.getCampaignId() ? window.Android.getCampaignId() : '0'
+      }
     } else {
       // this default params var browser can see ad
       adKeyValue = {
