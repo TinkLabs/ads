@@ -13,85 +13,124 @@
   </script>
 
   <script>
-    var getCookie = name => {
-      //获取name在Cookie中起止位置
-      let start = document.cookie.indexOf(name + "=")
-
-      if (start !== -1) {
-        start = start + name.length + 1
-        //获取value的终止位置
-        let end = document.cookie.indexOf(";", start)
-        if (end === -1)
-          end = document.cookie.length
-        //截获cookie的value值,并返回
-        return unescape(document.cookie.substring(start, end))
-      }
-      return ""
+    // change variable by ad host
+    var AD_HOST = window.location.host
+    var adPath
+    var CMSHost
+    if (AD_HOST === 'b2c-ads.hi.com') {
+      adPath = 'Tinklabs'
+      CMSHost = 'https://hk.handy.travel'
+    } else if (AD_HOST === 'ads-uat.handytravel.tech') {
+      adPath = 'UAT'
+      CMSHost = 'https://uat.handy.travel'
+    } else {
+      adPath = 'Test'
+      CMSHost = 'https://staging.handy.travel'
     }
 
     // get ad param from android
     var isAndroid = typeof window.Android !== 'undefined'
     var adParamsDict = []
-
-    if (isAndroid && window.Android.getAdKeyValue && window.Android.getAdKeyValue()) {
-      adKeyValue = JSON.parse(window.Android.getAdKeyValue())
-      if (window.Android.getCampaignId) {
-        adKeyValue.campaign_id = window.Android.getCampaignId() ? window.Android.getCampaignId() : '0'
-      }
-    } else {
-      // this default params var browser can see ad
-      adKeyValue = {
-        hotel_id: 5707,
-        campaign_id: 0,
-        lang:'en_GB',
-        star:0,
-        country:100,
-        zone_id:3
-      }
+    var adKeyValue = {}
+    var barcode = '355655090012297'
+    var campaignId = ''
+    if (isAndroid && window.Android.getGlobalProperties) {
+      globalProperties = JSON.parse(window.Android.getGlobalProperties())
+      barcode = globalProperties.imei
+      campaignId = window.Android.getCampaignId()
     }
 
-    var adKeyArr = Object.keys(adKeyValue)
-    adKeyArr.forEach((key, index) => {
-      adParamsDict[index] = {}
-      adParamsDict[index].key = adKeyArr[index]
-      adParamsDict[index].value = adKeyValue[adKeyArr[index]]
-    })
+    // native ajax request, just be compatible with chrome
+    var newAjax = function (method, url, fnSucc, fnFail) {
+      xhr = new XMLHttpRequest()
+      // 连接服务器
+      xhr.open(method, url);
+      // 发送请求,send里面如果是空参数时要不要穿null？
+      xhr.send();
+      // 接收响应
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+            // 这就是经常用的.then(data)或者.then(response)，参数其实就是返回的参数
+            // 这里把返回的参数作为请求成功的回调函数的参数
+            fnSucc(xhr.responseText);
+          } else {
+            // 或者与后台沟通定义的错误信息
+            fnFail('请求失败' + xhr.status);
+          }
+        }
+      }
+    }
+    var sendGoogleAd = function() {
+      // adKeyValue = {
+      //   hotel_id: 5707,
+      //   campaign_id: 0,
+      //   lang:'en_GB',
+      //   star:0,
+      //   country:100,
+      //   zone_id:3
+      // }
+      var adKeyArr = Object.keys(adKeyValue)
+      adKeyArr.forEach((key, index) => {
+        adParamsDict[index] = {}
+        adParamsDict[index].key = adKeyArr[index]
+        adParamsDict[index].value = adKeyValue[adKeyArr[index]]
+      })
 
+      // googletag.impl.pubads.callbackProxy1()
+      googletag.cmd.push(function () {
+        googletag.defineSlot(`/21623654641/${adPath}/Temp-C`, [360, 363], 'div-gpt-ad-1547119989301-0').addService(
+          googletag.pubads())
 
-    console.log(adParamsDict,66666)
-    
-    var AD_HOST = window.location.host
-    let adPath
+        googletag.pubads().enableSingleRequest();
+        googletag.enableServices();
 
-    if (AD_HOST === 'b2c-ads.hi.com') {
-      adPath = 'Tinklabs'
-    } else if (AD_HOST === 'ads-uat.handytravel.tech') {
-      adPath = 'UAT'
-    } else {
-      adPath = 'Test'
+        googletag.pubads().collapseEmptyDivs();
+
+        // dynamic set google ad params
+        adParamsDict.forEach(item => {
+          googletag.pubads().setTargeting(item.key, [item.value])
+        })
+
+        googletag.pubads().addEventListener('slotOnload', () => {
+          document.querySelector('#div-gpt-ad-1547119989301-0').style.height='363px'
+          document.querySelector('#div-gpt-ad-1547119989301-0').style.overflowY = 'visible'
+        })
+      });
     }
 
-    // googletag.impl.pubads.callbackProxy1()
-    googletag.cmd.push(function () {
-      googletag.defineSlot(`/21623654641/${adPath}/Temp-C`, [360, 363], 'div-gpt-ad-1547119989301-0').addService(
-        googletag.pubads())
-
-      googletag.pubads().enableSingleRequest();
-      googletag.enableServices();
-
-      googletag.pubads().collapseEmptyDivs();
-
-      // dynamic set google ad params
-      adParamsDict.forEach(item => {
-        googletag.pubads().setTargeting(item.key, [item.value])
+    // dynamic add google script in html
+    var addGoogleADScript = function() {
+      var id = 'div-gpt-ad-1547119989301-0'
+      var container = document.querySelector('#div-gpt-ad-1547119989301-0')
+      var script = document.createElement('script')
+      script.innerHTML = 'googletag.cmd.push(function () {' +
+          'googletag.display("div-gpt-ad-1547119989301-0");' +
+        '});'
+        // container.
+      container.appendChild(script)
+    }
+    // init function
+    ;(function() {
+      // get key-value from backend
+      newAjax('GET', CMSHost + '/apis/key_value?_barcode=' + barcode,
+      // success
+      function(data) {
+        adKeyValue = JSON.parse(data).key_value
+        adKeyValue.campaign_id = campaignId
+        if (!adKeyValue.campaign_id) {
+          adKeyValue.campaign_id = '0'
+        }
+        // send google ad
+        sendGoogleAd()
+        // add google ad script
+        addGoogleADScript()
+      },
+      // fail
+      function (e) {
+        console.log(e)
       })
-
-      googletag.pubads().addEventListener('slotOnload', () => {
-        document.querySelector('#div-gpt-ad-1547119989301-0').style.height='363px'
-        document.querySelector('#div-gpt-ad-1547119989301-0').style.overflowY = 'visible'
-      })
-
-    });
+    })()
   </script>
   <!-- Demo styles -->
 <style>
@@ -106,11 +145,6 @@ body{
 </head>
 <body>
     <div id='div-gpt-ad-1547119989301-0' style="min-width:360px;height:0px;overflow-y: hidden;">
-        <script>
-        googletag.cmd.push(function () {
-            googletag.display('div-gpt-ad-1547119989301-0');
-        });
-        </script>
     </div>
 </body>
 </html>

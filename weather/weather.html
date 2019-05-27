@@ -120,95 +120,120 @@
 </script>
     
 <script>
-    const getCookie = name => {
-        //获取name在Cookie中起止位置
-        let start = document.cookie.indexOf(name + "=")
-
-        if (start !== -1) {
-        start = start + name.length + 1
-        //获取value的终止位置
-        let end = document.cookie.indexOf(";", start)
-        if (end === -1)
-            end = document.cookie.length
-        //截获cookie的value值,并返回
-        return unescape(document.cookie.substring(start, end))
-        }
-        return ""
-    }
-
-     // get ad param from android
-     var isAndroid = typeof window.Android !== 'undefined'
-    var adParamsDict = []
-
-    
-    if (isAndroid && window.Android.getAdKeyValue && window.Android.getAdKeyValue()) {
-      adKeyValue = JSON.parse(window.Android.getAdKeyValue())
-      if (window.Android.getCampaignId) {
-        adKeyValue.campaign_id = window.Android.getCampaignId() ? window.Android.getCampaignId() : '0'
-      }
-    } else {
-      // this default params var browser can see ad
-      adKeyValue = {
-        hotel_id: 5707,
-        campaign_id: 0,
-        lang:'en_GB',
-        star:0,
-        country:100,
-        zone_id:3
-      }
-    }
-
-   var adKeyArr = Object.keys(adKeyValue)
-    adKeyArr.forEach((key, index) => {
-      adParamsDict[index] = {}
-      adParamsDict[index].key = adKeyArr[index]
-      adParamsDict[index].value = adKeyValue[adKeyArr[index]]
-    })
-
-
-    console.log(adParamsDict,66666)
-    
+    // change variable by ad host
     var AD_HOST = window.location.host
-    let adPath
-
+    var adPath
+    var CMSHost
     if (AD_HOST === 'b2c-ads.hi.com') {
       adPath = 'Tinklabs'
+      CMSHost = 'https://hk.handy.travel'
     } else if (AD_HOST === 'ads-uat.handytravel.tech') {
       adPath = 'UAT'
+      CMSHost = 'https://uat.handy.travel'
     } else {
       adPath = 'Test'
+      CMSHost = 'https://staging.handy.travel'
     }
 
-    googletag.cmd.push(function() {
-            googletag.defineSlot('/21623654641/Tinklabs/WW-01', [[360, 60]], 'div-gpt-ad-1539583823874-0')
-                .addService(googletag.pubads())
-                .setCollapseEmptyDiv(true,true);
-            googletag.pubads().enableSingleRequest();
+    // get ad param from android
+    var isAndroid = typeof window.Android !== 'undefined'
+    var adParamsDict = []
+    var adKeyValue = {}
+    var barcode = '355655090012297'
+    var campaignId = ''
+    if (isAndroid && window.Android.getGlobalProperties) {
+      globalProperties = JSON.parse(window.Android.getGlobalProperties())
+      barcode = globalProperties.imei
+      campaignId = window.Android.getCampaignId()
+    }
 
-            // dynamic set google ad params
-            adParamsDict.forEach(item => {
-                googletag.pubads().setTargeting(item.key, [item.value])
-            })
-            
-            //googletag.pubads().collapseEmptyDivs();
-            googletag.enableServices();
-        });
+    // native ajax request, just be compatible with chrome
+    var newAjax = function (method, url, fnSucc, fnFail) {
+      xhr = new XMLHttpRequest()
+      // 连接服务器
+      xhr.open(method, url);
+      // 发送请求,send里面如果是空参数时要不要穿null？
+      xhr.send();
+      // 接收响应
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+            // 这就是经常用的.then(data)或者.then(response)，参数其实就是返回的参数
+            // 这里把返回的参数作为请求成功的回调函数的参数
+            fnSucc(xhr.responseText);
+          } else {
+            // 或者与后台沟通定义的错误信息
+            fnFail('请求失败' + xhr.status);
+          }
+        }
+      }
+    }
+    var sendGoogleAd = function() {
+      // default value
+      // adKeyValue = {
+      //   hotel_id: 5707,
+      //   campaign_id: 0,
+      //   lang:'en_GB',
+      //   star:0,
+      //   country:100,
+      //   zone_id:3
+      // }
 
-    // googletag.cmd.push(function () {
-    //     googletag.defineSlot(`/21623654641/${adPath}/WW-01`, [360, 363], 'div-gpt-ad-1539583823874-0').addService(
-    //     googletag.pubads());
+      var adKeyArr = Object.keys(adKeyValue)
+      adKeyArr.forEach((key, index) => {
+        adParamsDict[index] = {}
+        adParamsDict[index].key = adKeyArr[index]
+        adParamsDict[index].value = adKeyValue[adKeyArr[index]]
+      })
 
-    //     googletag.pubads().enableSingleRequest();
-    //     googletag.enableServices();
-    //     googletag.pubads().collapseEmptyDivs();
-    //     if (hotelId) {
-    //     googletag.pubads().setTargeting('country', [country]).setTargeting('zone_id', [zoneId]).setTargeting('star', [star]).setTargeting('hotel_id', [hotelId]).setTargeting('lang', [lang]).setTargeting('campaign_id', [campaignId]);
-    //     }else{
-    //     googletag.pubads().setTargeting('country', ['46']).setTargeting('zone_id', ['395']).setTargeting('star', ['1']).setTargeting('hotel_id', ['5700']).setTargeting('lang', ['en_GB']).setTargeting('campaign_id', ['0']);
-    //     }
-    //     // console.log(googletag.pubads());
+      googletag.cmd.push(function() {
+        googletag.defineSlot('/21623654641/Tinklabs/WW-01', [[360, 60]],'div-gpt-ad-1539583823874-0')
+            .addService(googletag.pubads())
+            .setCollapseEmptyDiv(true,true);
+        googletag.pubads().enableSingleRequest();
 
-    // });
+        // dynamic set google ad params
+        adParamsDict.forEach(item => {
+            googletag.pubads().setTargeting(item.key, [item.value])
+        })
+        
+        //googletag.pubads().collapseEmptyDivs();
+        googletag.enableServices();
+      });
+    }
+
+    // dynamic add google script in html
+    var addGoogleADScript = function() {
+      var id = 'div-gpt-ad-1539583823874-0'
+      var container = document.querySelector('#div-gpt-ad-1539583823874-0')
+      var script = document.createElement('script')
+      script.innerHTML = 'googletag.cmd.push(function () {' +
+          'googletag.display("div-gpt-ad-1539583823874-0");' +
+        '});'
+        // container.
+      container.appendChild(script)
+    }
+    // init function
+    ;(function() {
+      // get key-value from backend
+      newAjax('GET', CMSHost + '/apis/key_value?_barcode=' + barcode,
+      // success
+      function(data) {
+        adKeyValue = JSON.parse(data).key_value
+        adKeyValue.campaign_id = campaignId
+        if (!adKeyValue.campaign_id) {
+          adKeyValue.campaign_id = '0'
+        }
+        // send google ad
+        sendGoogleAd()
+        // add google ad script
+        addGoogleADScript()
+      },
+      // fail
+      function (e) {
+        console.log(e)
+      })
+    })()
 </script>
 
 
@@ -221,7 +246,7 @@
         <div class="weather-header">
             <div class="header-content weather-header-left">
                 <div class="cf-toggle">
-                    <span class="temperature-unit" onclick="unitChange(event)" >°C</span><span class="temperature-unit curr-unit" data-unit="°F" onclick="unitChange(event)">°F</span>
+                    <span class="temperature-unit curr-unit" onclick="unitChange(event)" >°C</span><span class="temperature-unit" data-unit="°F" onclick="unitChange(event)">°F</span>
                 </div>
             </div>
             <div class="header-content weather-header-right">
@@ -313,16 +338,47 @@
            
         </div>
   </div>
-  <div class="ad-box" style="margin-top:10px;">
-        <div id='div-gpt-ad-1539583823874-0' styl="width:360px;height:363px;overflow-x: hidden;">
-                <script>
-                googletag.cmd.push(function () {
-                    googletag.display('div-gpt-ad-1539583823874-0');
-                });
-                </script>
-            </div>
+  <div class="ad-box ad-container" style="margin-top:10px;">
+      <div id='div-gpt-ad-1539583823874-0' styl="width:360px;height:363pxoverflow-x: hidden;">
+      </div>
   </div>
 </div>
+
+<script>
+        googletag.cmd.push(function () {
+        
+            var adContainer = document.querySelector('.ad-container')
+
+            // slot has rendered but ad not loaded completely
+            googletag.pubads().addEventListener('slotRenderEnded', (e) => {
+                
+                if (!adContainer) {
+                    adContainer = document.querySelector('.ad-container');
+                }
+                var currentId = e.slot.getSlotElementId()
+                
+                // remove emplty ad
+                if (e.isEmpty) {
+                    adContainer.removeChild(document.querySelector(`#${currentId}`))
+                }
+            });
+
+            // ad has loaded completely
+            googletag.pubads().addEventListener('slotOnload', (e) => {
+               
+                // init swiper, just init once
+                if (!adContainer) {
+                    adContainer.querySelector('div').style.height = '60px'
+                    document.querySelector('.adcontent').style.overflow = 'hidden'
+                }
+                // remove click background
+                var currentId = e.slot.getSlotElementId()
+                var currentAdFrameDoc = document.querySelector(`#${currentId}`).querySelector('iframe').contentWindow.document
+                let aLink = currentAdFrameDoc.querySelector('a')
+                aLink.style[`-webkit-tap-highlight-color`] = 'rgba(255,255,255,0)'
+            });
+        })
+  </script>
 
 <script>
     var value_elements = document.querySelectorAll('.temperature-value');
@@ -357,7 +413,7 @@
         const forcast_items = document.querySelectorAll('.forecast-item')
         const temperature_items = document.querySelectorAll('.temperature-item')
         
-        fetch('https://staging.handy.travel/apis/get_weather_info?_barcode=355655090012297')
+        fetch('https://staging.handy.travel/apis/get_weather_info?_barcode='+ barcode)
             .then(res => res.json())
             .catch(e => {
                 console.log('Error:', e)
